@@ -48,7 +48,6 @@ func getJSON(r *http.Response, target interface{}) error {
 
 
 func (client *Client) sendRequestUpdate(u url.URL, body *bytes.Reader) (*http.Response, error) {
-    log.Println(u.String())
     req, err := http.NewRequest("PATCH", u.String(), ioutil.NopCloser(body))
     req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
     req.Header.Add("Content-Type", "application/json")
@@ -59,7 +58,6 @@ func (client *Client) sendRequestUpdate(u url.URL, body *bytes.Reader) (*http.Re
 
 
 func (client *Client) sendRequestCreate(u url.URL, body *bytes.Reader) (*GetWorkspace, error) {
-    log.Println(u.String())
     req, err := http.NewRequest("POST", u.String(), ioutil.NopCloser(body))
     req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
     req.Header.Add("Content-Type", "application/json")
@@ -93,7 +91,6 @@ func (client *Client) sendRequestDelete(u url.URL) (*http.Response, error) {
 }
 
 func (client *Client) sendRequestRead(u url.URL) (*GetWorkspace, error) {
-    log.Println(u.String())
     req, err := http.NewRequest("GET", u.String(), nil)
     req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
     req.Header.Add("Content-Type", "application/json")

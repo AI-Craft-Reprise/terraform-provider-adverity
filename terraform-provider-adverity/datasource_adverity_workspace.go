@@ -26,7 +26,6 @@ func datasourceWorkspace() *schema.Resource {
 			"workspace_id": {
 				Type:     schema.TypeString,
 				Required: true,
-				Description: "The id is the workspace's slug",
 			},
 		},
 		Read: workspaceDataSource,
