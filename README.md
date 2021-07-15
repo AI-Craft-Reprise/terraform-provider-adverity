@@ -1,1 +1,0 @@
-# fourcast-terraform-adverity
