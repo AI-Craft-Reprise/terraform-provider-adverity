@@ -25,7 +25,8 @@ func workspace() *schema.Resource {
 			},
 			"parent_id": &schema.Schema{
 				Type:     schema.TypeInt,
-				Required: true,
+				Optional: true,
+				Default: 1,
 			},
 			"slug": {
 				Type:     schema.TypeString,

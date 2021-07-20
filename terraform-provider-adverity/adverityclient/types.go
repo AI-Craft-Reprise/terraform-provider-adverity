@@ -39,7 +39,14 @@ type DeleteWorkspaceConfig struct {
 	StackSlug     string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
 }
 
-type GetWorkspace struct {
+type ConnectionConfig struct {
+	Name         string      `json:"name"`
+	Stack        int         `json:"stack"`
+	App          int         `json:"app"`
+}
+
+
+type Workspace struct {
 	AddConnectionURL string      `json:"add_connection_url"`
 	AddDatastreamURL string      `json:"add_datastream_url"`
 	ChangeURL        string      `json:"change_url"`
@@ -66,4 +73,12 @@ type GetWorkspace struct {
 	DefaultManageExtractNames bool      `json:"default_manage_extract_names"`
 	Updated                   string `json:"updated"`
 	Created                   string `json:"created"`
+}
+
+type Connection struct {
+	ID           int         `json:"id"`
+	Name         string      `json:"name"`
+	Stack        int         `json:"stack"`
+	App          int         `json:"app"`
+	IsAuthorized bool        `json:"is_authorized"`
 }

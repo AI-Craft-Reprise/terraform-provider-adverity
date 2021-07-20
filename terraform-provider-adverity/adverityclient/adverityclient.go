@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"io/ioutil"
-	"strconv"
 )
 
 // CreateClientFromLogin can be used to create an alooma client from an API key
@@ -53,30 +52,35 @@ func (client *Client) sendRequestUpdate(u url.URL, body *bytes.Reader) (*http.Re
     req.Header.Add("Content-Type", "application/json")
 
 	response, err := client.httpClient.Do(req)
+	if err != nil {
+	    return nil, err
+    }
 	return response, err
 }
 
 
-func (client *Client) sendRequestCreate(u url.URL, body *bytes.Reader) (*GetWorkspace, error) {
+func (client *Client) sendRequestCreate(u url.URL, body *bytes.Reader) (*http.Response, error) {
     req, err := http.NewRequest("POST", u.String(), ioutil.NopCloser(body))
     req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
     req.Header.Add("Content-Type", "application/json")
 
 	response, err := client.httpClient.Do(req)
-    resMap:= &GetWorkspace{}
-    if !responseOK(response) {
-		defer response.Body.Close()
-		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
-	}
-
-
-	err = getJSON(response, resMap)
-	if err != nil {
+//     resMap:= &Workspace{}
+//     if !responseOK(response) {
+// 		defer response.Body.Close()
+// 		body, _ := ioutil.ReadAll(response.Body)
+// 		return resMap, errorString{"Failed creating resource. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+// 	}
+//
+//
+// 	err = getJSON(response, resMap)
+// 	if err != nil {
+// 	    return nil, err
+//     }
+    if err != nil {
 	    return nil, err
     }
-
-	return resMap, err
+	return response, err
 }
 
 
@@ -87,27 +91,35 @@ func (client *Client) sendRequestDelete(u url.URL) (*http.Response, error) {
     req.Header.Add("Content-Type", "application/json")
 
 	response, err := client.httpClient.Do(req)
+	if err != nil {
+	    return nil, err
+    }
 	return response, err
 }
 
-func (client *Client) sendRequestRead(u url.URL) (*GetWorkspace, error) {
+func (client *Client) sendRequestRead(u url.URL) (*http.Response, error) {
     req, err := http.NewRequest("GET", u.String(), nil)
     req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
     req.Header.Add("Content-Type", "application/json")
 
 	response, err := client.httpClient.Do(req)
-    resMap:= &GetWorkspace{}
-    if !responseOK(response) {
-		defer response.Body.Close()
-		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
-	}
 
-
-	err = getJSON(response, resMap)
-	if err != nil {
+	if err != nil{
 	    return nil, err
-    }
-
-	return resMap, err
+	}
+	return response, err
+//     resMap:= &Workspace{}
+//     if !responseOK(response) {
+// 		defer response.Body.Close()
+// 		body, _ := ioutil.ReadAll(response.Body)
+// 		return resMap, errorString{"Failed reading resource. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+// 	}
+//
+//
+// 	err = getJSON(response, resMap)
+// 	if err != nil {
+// 	    return nil, err
+//     }
+//
+// 	return resMap, err
 }
