@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 )
 
+
 // CreateClientFromLogin can be used to create an alooma client from an API key
 func CreateClientFromLogin(instanceURL, token string) (*Client, error) {
 	var client Client
@@ -65,18 +66,6 @@ func (client *Client) sendRequestCreate(u url.URL, body *bytes.Reader) (*http.Re
     req.Header.Add("Content-Type", "application/json")
 
 	response, err := client.httpClient.Do(req)
-//     resMap:= &Workspace{}
-//     if !responseOK(response) {
-// 		defer response.Body.Close()
-// 		body, _ := ioutil.ReadAll(response.Body)
-// 		return resMap, errorString{"Failed creating resource. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
-// 	}
-//
-//
-// 	err = getJSON(response, resMap)
-// 	if err != nil {
-// 	    return nil, err
-//     }
     if err != nil {
 	    return nil, err
     }
@@ -108,18 +97,4 @@ func (client *Client) sendRequestRead(u url.URL) (*http.Response, error) {
 	    return nil, err
 	}
 	return response, err
-//     resMap:= &Workspace{}
-//     if !responseOK(response) {
-// 		defer response.Body.Close()
-// 		body, _ := ioutil.ReadAll(response.Body)
-// 		return resMap, errorString{"Failed reading resource. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
-// 	}
-//
-//
-// 	err = getJSON(response, resMap)
-// 	if err != nil {
-// 	    return nil, err
-//     }
-//
-// 	return resMap, err
 }

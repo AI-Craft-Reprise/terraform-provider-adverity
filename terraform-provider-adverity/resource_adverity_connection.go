@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+
 func connection() *schema.Resource {
 	return &schema.Resource{
 		Create: connectionCreate,
@@ -26,10 +27,13 @@ func connection() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"app": &schema.Schema{
-				Type:     schema.TypeInt,
-				Optional: true,
-			},
+			"connection_parameters": {
+                Type:     schema.TypeMap,
+                Optional: true,
+                Elem: &schema.Schema{
+                        Type: schema.TypeString,
+                },
+            },
 		},
 	}
 }
@@ -40,7 +44,19 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
 	connection_type_id := d.Get("connection_type_id").(int)
-	app := d.Get("app").(int)
+
+    connection_parameters, exists := d.GetOk("connection_parameters")
+
+    parameters:=[]*adverityclient.ConnectionParameters{}
+
+	if exists {
+		for n, v := range connection_parameters.(map[string]interface{}) {
+			parameter:=new(adverityclient.ConnectionParameters)
+			parameter.Value=v.(string)
+			parameter.Name=n
+			parameters=append(parameters,parameter)
+		}
+	}
 
 	providerConfig := m.(*config)
 
@@ -49,7 +65,7 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.ConnectionConfig{
 		Name:     name,
 		Stack:    stack,
-		App:    app,
+		ConnectionParameters: parameters,
 	}
 
     res, err := client.CreateConnection(conf, connection_type_id)
@@ -59,7 +75,7 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
     d.SetId(strconv.Itoa(res.ID))
-	//TODO here we should authorized the application
+	//TODO here we should authorized the application or not
 
 	return connectionRead(d, m)
 }
@@ -83,7 +99,6 @@ func connectionRead(d *schema.ResourceData, m interface{}) error {
 	}
 	d.Set("name", res.Name)
 	d.Set("stack", res.Stack)
-	d.Set("app", res.App)
 
 
 	return nil
@@ -93,7 +108,18 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
 	connection_type_id := d.Get("connection_type_id").(int)
-	app := d.Get("app").(int)
+
+	connection_parameters, exists := d.GetOk("connection_parameters")
+
+    parameters:=[]*adverityclient.ConnectionParameters{}
+    if exists {
+		for n, v := range connection_parameters.(map[string]interface{}) {
+			parameter:=new(adverityclient.ConnectionParameters)
+			parameter.Value=v.(string)
+			parameter.Name=n
+			parameters=append(parameters,parameter)
+		}
+	}
 
 	providerConfig := m.(*config)
 
@@ -102,7 +128,7 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.ConnectionConfig{
 		Name:     name,
 		Stack:    stack,
-		App:    app,
+		ConnectionParameters: parameters,
 	}
 
 	_, err := client.UpdateConnection(conf, d.Id(),connection_type_id)

@@ -7,7 +7,6 @@ import (
 
 
 type Client struct {
-// 	username, password, bearerToken string
 	token string
 	restURL                    *url.URL
 	requestsParams             map[string]string
@@ -39,12 +38,17 @@ type DeleteWorkspaceConfig struct {
 	StackSlug     string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
 }
 
+type ConnectionParameters struct {
+    Name string `json:"name"`
+    Value string `json:"value"`
+}
+
+
 type ConnectionConfig struct {
 	Name         string      `json:"name"`
 	Stack        int         `json:"stack"`
-	App          int         `json:"app"`
+    ConnectionParameters []*ConnectionParameters `json:"parameters"`
 }
-
 
 type Workspace struct {
 	AddConnectionURL string      `json:"add_connection_url"`
@@ -76,9 +80,13 @@ type Workspace struct {
 }
 
 type Connection struct {
-	ID           int         `json:"id"`
-	Name         string      `json:"name"`
-	Stack        int         `json:"stack"`
-	App          int         `json:"app"`
-	IsAuthorized bool        `json:"is_authorized"`
+	ID            int    `json:"id"`
+	Name          string `json:"name"`
+	MetadataSlack int    `json:"metadata_slack"`
+	Stack         int    `json:"stack"`
+	App           int    `json:"app"`
+	User          int    `json:"user"`
+	IsAuthorized  bool   `json:"is_authorized"`
 }
+
+
