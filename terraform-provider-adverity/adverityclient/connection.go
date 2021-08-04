@@ -7,6 +7,7 @@ import (
     "encoding/json"
     "bytes"
     "log"
+    "fmt"
 )
 
 func (client *Client) ReadConnection(id string, connection_type_id int) (*Connection, error) {
@@ -30,11 +31,22 @@ func (client *Client) ReadConnection(id string, connection_type_id int) (*Connec
 
 }
 
+func (c *ConnectionConfig) MarshalJSON() ([]byte, error) {
+	m := map[string]string{
+		"name":  c.Name,
+		"stack": fmt.Sprintf("%d", c.Stack),
+	}
+	for _, param := range c.ConnectionParameters {
+		m[param.Name] = param.Value
+	}
+	return json.Marshal(m)
+}
+
 func (client *Client) CreateConnection(conf ConnectionConfig, connection_type_id int) (*Connection, error) {
 	u := *client.restURL
 	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/"
 
-	body, _ := json.Marshal(conf)
+	body, _ := json.Marshal(&conf)
 	log.Println(string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
 	resMap:= &Connection{}
@@ -57,7 +69,7 @@ func (client *Client) UpdateConnection(conf ConnectionConfig, id string, connect
 	u := *client.restURL
 	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/" + id +"/"
 
-	body, _ := json.Marshal(conf)
+	body, _ := json.Marshal(&conf)
 	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
