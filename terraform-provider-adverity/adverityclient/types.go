@@ -50,6 +50,14 @@ type ConnectionConfig struct {
     ConnectionParameters []*ConnectionParameters `json:"parameters"`
 }
 
+type DestinationConfig struct {
+	Name         string      `json:"name"`
+	Stack        int         `json:"stack"`
+    ProjectID     string      `json:"project"`
+    DatasetID    string      `json:"dataset"`
+    Auth         int         `json:"auth"`
+}
+
 type Workspace struct {
 	AddConnectionURL string      `json:"add_connection_url"`
 	AddDatastreamURL string      `json:"add_datastream_url"`
@@ -89,4 +97,19 @@ type Connection struct {
 	IsAuthorized  bool   `json:"is_authorized"`
 }
 
+type Destination struct {
+	ID                      int    `json:"id"`
+	LogoURL                 string `json:"logo_url"`
+	IsSchemaMappingRequired bool   `json:"is_schema_mapping_required"`
+	Name                    string `json:"name"`
+	SchemaMapping           bool   `json:"schema_mapping"`
+	ForceString             bool   `json:"force_string"`
+	FormatHeaders           bool   `json:"format_headers"`
+	ColumnNamesToLowercase  bool   `json:"column_names_to_lowercase"`
+	Project                 string `json:"project"`
+	Dataset                 string `json:"dataset"`
+	HeadersFormatting       int    `json:"headers_formatting"`
+	Stack                   int    `json:"stack"`
+	Auth                    int    `json:"auth"`
+}
 
