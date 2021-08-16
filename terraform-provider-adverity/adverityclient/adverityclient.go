@@ -8,7 +8,7 @@ import (
 	"time"
 	"bytes"
 	"fmt"
-	"log"
+// 	"log"
 	"io/ioutil"
 )
 
@@ -74,7 +74,7 @@ func (client *Client) sendRequestCreate(u url.URL, body *bytes.Reader) (*http.Re
 
 
 func (client *Client) sendRequestDelete(u url.URL) (*http.Response, error) {
-    log.Println(u.String())
+//     log.Println(u.String())
     req, err := http.NewRequest("DELETE", u.String(), nil)
     req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
     req.Header.Add("Content-Type", "application/json")

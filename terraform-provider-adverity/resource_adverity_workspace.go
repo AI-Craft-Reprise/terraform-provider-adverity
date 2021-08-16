@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"example.com/adverityclient"
 	"strconv"
-	"log"
+// 	"log"
 )
 
 func workspace() *schema.Resource {
@@ -123,7 +123,7 @@ func workspaceDelete(d *schema.ResourceData, m interface{}) error {
 
 
 	client := *providerConfig.Client
-    log.Println(d.Get("slug").(string))
+//     log.Println(d.Get("slug").(string))
 	conf := adverityclient.DeleteWorkspaceConfig{
 		StackSlug: d.Get("slug").(string),
 	}

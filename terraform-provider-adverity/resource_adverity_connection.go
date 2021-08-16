@@ -47,11 +47,11 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 
     connection_parameters, exists := d.GetOk("connection_parameters")
 
-    parameters:=[]*adverityclient.ConnectionParameters{}
+    parameters:=[]*adverityclient.Parameters{}
 
 	if exists {
 		for n, v := range connection_parameters.(map[string]interface{}) {
-			parameter:=new(adverityclient.ConnectionParameters)
+			parameter:=new(adverityclient.Parameters)
 			parameter.Value=v.(string)
 			parameter.Name=n
 			parameters=append(parameters,parameter)
@@ -65,7 +65,7 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.ConnectionConfig{
 		Name:     name,
 		Stack:    stack,
-		ConnectionParameters: parameters,
+		Parameters: parameters,
 	}
 
     res, err := client.CreateConnection(conf, connection_type_id)
@@ -111,10 +111,10 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 
 	connection_parameters, exists := d.GetOk("connection_parameters")
 
-    parameters:=[]*adverityclient.ConnectionParameters{}
+    parameters:=[]*adverityclient.Parameters{}
     if exists {
 		for n, v := range connection_parameters.(map[string]interface{}) {
-			parameter:=new(adverityclient.ConnectionParameters)
+			parameter:=new(adverityclient.Parameters)
 			parameter.Value=v.(string)
 			parameter.Name=n
 			parameters=append(parameters,parameter)
@@ -128,7 +128,7 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.ConnectionConfig{
 		Name:     name,
 		Stack:    stack,
-		ConnectionParameters: parameters,
+		Parameters: parameters,
 	}
 
 	_, err := client.UpdateConnection(conf, d.Id(),connection_type_id)

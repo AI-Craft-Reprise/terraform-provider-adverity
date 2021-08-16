@@ -4,149 +4,228 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"example.com/adverityclient"
 	"strconv"
+// 	"log"
+// 	"reflect"
 )
 
 
-func connection() *schema.Resource {
-	return &schema.Resource{
-		Create: connectionCreate,
-		Read:   connectionRead,
-		Update: connectionUpdate,
-		Delete: connectionDelete,
+func datastream() * schema.Resource {
+    return &schema.Resource {
+        Create: datastreamCreate,
+        Read: datastreamRead,
+        Update: datastreamUpdate,
+        Delete: datastreamDelete,
 
-		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
-				Type:     schema.TypeString,
-				Required: true,
-			},
-			"stack": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
-			},
-			"connection_type_id": &schema.Schema{
-				Type:     schema.TypeInt,
-				Required: true,
-			},
-			"connection_parameters": {
-                Type:     schema.TypeMap,
+        Schema: map[string] * schema.Schema {
+            "name": & schema.Schema {
+                Type: schema.TypeString,
+                Required: true,
+            },
+            "stack": & schema.Schema {
+                Type: schema.TypeInt,
+                Required: true,
+            },
+            "datastream_type_id": & schema.Schema {
+                Type: schema.TypeInt,
+                Required: true,
+            },
+            "datastream_parameters": {
+                Type: schema.TypeMap,
                 Optional: true,
-                Elem: &schema.Schema{
-                        Type: schema.TypeString,
+                Elem: & schema.Schema {
+                    Type: schema.TypeString,
                 },
             },
-		},
-	}
+            "datastream_list": {
+                Type: schema.TypeSet,
+                Optional: true,
+                Elem: & schema.Resource {
+                    Schema: map[string]*schema.Schema{
+                        "parameter": {
+                            Type:     schema.TypeList,
+                            Optional: true,
+                             Elem: &schema.Resource{
+                                Schema: map[string]*schema.Schema{
+                                    "name": {
+                                        Type:     schema.TypeString,
+                                        Optional: true,
+                                    },
+                                    "values": {
+                                        Type:     schema.TypeList,
+                                        Optional: true,
+                                        Elem: &schema.Schema{
+                                            Type:         schema.TypeInt,
+                                        },
+                                    },
+                                },
+                             },
+                        },
+                    },
+                },
+            },
+
+        },
+    }
 }
 
 
-
-func connectionCreate(d *schema.ResourceData, m interface{}) error {
+func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
-	connection_type_id := d.Get("connection_type_id").(int)
+	datastream_type_id := d.Get("datastream_type_id").(int)
 
-    connection_parameters, exists := d.GetOk("connection_parameters")
+    datastream_parameters, exists := d.GetOk("datastream_parameters")
 
-    parameters:=[]*adverityclient.ConnectionParameters{}
+    parameters:=[]*adverityclient.Parameters{}
 
 	if exists {
-		for n, v := range connection_parameters.(map[string]interface{}) {
-			parameter:=new(adverityclient.ConnectionParameters)
+		for n, v := range datastream_parameters.(map[string]interface{}) {
+			parameter:=new(adverityclient.Parameters)
 			parameter.Value=v.(string)
 			parameter.Name=n
 			parameters=append(parameters,parameter)
 		}
 	}
 
+	datastream_list_map, exists := d.GetOk("datastream_list")
+
+    parameters_list_int:=[]*adverityclient.ParametersListInt{}
+    if exists {
+        datastreamParamSet := datastream_list_map.(*schema.Set).List()
+        for _, datastreamParam := range datastreamParamSet {
+
+            for _, dp := range datastreamParam.(map[string]interface{}) {
+                for _, param := range dp.([]interface{}) {
+                    parameter:=new(adverityclient.ParametersListInt)
+                    values := param.(map[string]interface{})["values"]
+                    name := param.(map[string]interface{})["name"]
+                    parameter.Name=name.(string)
+                    for _, value := range values.([]interface{}){
+                       parameter.Value=append(parameter.Value,value.(int))
+                    }
+                    parameters_list_int=append(parameters_list_int,parameter)
+                }
+            }
+
+
+        }
+
+	}
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
-	conf := adverityclient.ConnectionConfig{
+	conf := adverityclient.DatastreamConfig{
 		Name:     name,
 		Stack:    stack,
-		ConnectionParameters: parameters,
+		Parameters: parameters,
+		ParametersListInt: parameters_list_int,
 	}
 
-    res, err := client.CreateConnection(conf, connection_type_id)
+    res, err := client.CreateDatastream(conf, datastream_type_id)
 
 	if err != nil {
 		return err
 	}
 
     d.SetId(strconv.Itoa(res.ID))
-	//TODO here we should authorized the application or not
 
-	return connectionRead(d, m)
+	return datastreamRead(d, m)
 }
 
 
 
 
 
-func connectionRead(d *schema.ResourceData, m interface{}) error {
+func datastreamRead(d *schema.ResourceData, m interface{}) error {
 
-	connection_type_id := d.Get("connection_type_id").(int)
+	datastream_type_id := d.Get("datastream_type_id").(int)
 
     providerConfig := m.(*config)
 
     client := *providerConfig.Client
 
 
-	res, err := client.ReadConnection(d.Id(),connection_type_id)
+	res, err := client.ReadDatastream(d.Id(),datastream_type_id)
 	if err != nil {
 		return err
 	}
 	d.Set("name", res.Name)
-	d.Set("stack", res.Stack)
+	d.Set("stack", res.StackID)
 
 
 	return nil
 }
 
-func connectionUpdate(d *schema.ResourceData, m interface{}) error {
+func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
-	connection_type_id := d.Get("connection_type_id").(int)
+	datastream_type_id := d.Get("datastream_type_id").(int)
 
-	connection_parameters, exists := d.GetOk("connection_parameters")
+	datastream_parameters, exists := d.GetOk("datastream_parameters")
 
-    parameters:=[]*adverityclient.ConnectionParameters{}
-    if exists {
-		for n, v := range connection_parameters.(map[string]interface{}) {
-			parameter:=new(adverityclient.ConnectionParameters)
+    parameters:=[]*adverityclient.Parameters{}
+
+	if exists {
+		for n, v := range datastream_parameters.(map[string]interface{}) {
+			parameter:=new(adverityclient.Parameters)
 			parameter.Value=v.(string)
 			parameter.Name=n
 			parameters=append(parameters,parameter)
 		}
 	}
 
+	datastream_list_map, exists := d.GetOk("datastream_list")
+
+    parameters_list_int:=[]*adverityclient.ParametersListInt{}
+    if exists {
+        datastreamParamSet := datastream_list_map.(*schema.Set).List()
+        for _, datastreamParam := range datastreamParamSet {
+
+            for _, dp := range datastreamParam.(map[string]interface{}) {
+                for _, param := range dp.([]interface{}) {
+                    parameter:=new(adverityclient.ParametersListInt)
+                    values := param.(map[string]interface{})["values"]
+                    name := param.(map[string]interface{})["name"]
+                    parameter.Name=name.(string)
+                    for _, value := range values.([]interface{}){
+                       parameter.Value=append(parameter.Value,value.(int))
+                    }
+                    parameters_list_int=append(parameters_list_int,parameter)
+                }
+            }
+
+
+        }
+
+	}
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
-	conf := adverityclient.ConnectionConfig{
+	conf := adverityclient.DatastreamConfig{
 		Name:     name,
 		Stack:    stack,
-		ConnectionParameters: parameters,
+		Parameters: parameters,
+		ParametersListInt: parameters_list_int,
 	}
 
-	_, err := client.UpdateConnection(conf, d.Id(),connection_type_id)
+	_, err := client.UpdateDatastream(conf, d.Id(),datastream_type_id)
 
 	if err != nil {
 		return err
 	}
-	return connectionRead(d, m)
+	return datastreamRead(d, m)
 }
 
-func connectionDelete(d *schema.ResourceData, m interface{}) error {
-    connection_type_id := d.Get("connection_type_id").(int)
+func datastreamDelete(d *schema.ResourceData, m interface{}) error {
+    datastream_type_id := d.Get("datastream_type_id").(int)
 	providerConfig := m.(*config)
 
 
 	client := *providerConfig.Client
 
-	_, err := client.DeleteConnection(d.Id(), connection_type_id)
+	_, err := client.DeleteDatastream(d.Id(), datastream_type_id)
 
 	if err != nil {
 		return err

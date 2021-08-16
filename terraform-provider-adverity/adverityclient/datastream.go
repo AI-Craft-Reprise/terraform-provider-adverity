@@ -6,20 +6,20 @@ import (
 	"strconv"
     "encoding/json"
     "bytes"
-    "log"
+//     "log"
     "fmt"
 )
 
-func (client *Client) ReadConnection(id string, connection_type_id int) (*Connection, error) {
+func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datastream, error) {
 	u := *client.restURL
-	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/" + id +"/"
+	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id +"/"
     response, err := client.sendRequestRead(u)
 
-	resMap:= &Connection{}
+	resMap:= &Datastream{}
     if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading connection. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	err = getJSON(response, resMap)
@@ -31,29 +31,37 @@ func (client *Client) ReadConnection(id string, connection_type_id int) (*Connec
 
 }
 
-func (c *ConnectionConfig) MarshalJSON() ([]byte, error) {
-	m := map[string]string{
+func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
 		"name":  c.Name,
 		"stack": fmt.Sprintf("%d", c.Stack),
 	}
+
+
 	for _, param := range c.Parameters {
 		m[param.Name] = param.Value
+	}
+    for _, p := range c.ParametersListInt {
+	    arr_int:=[]int{}
+	    for _,v := range p.Value{
+            arr_int = append(arr_int,v)
+		}
+		m[p.Name] = arr_int
 	}
 	return json.Marshal(m)
 }
 
-func (client *Client) CreateConnection(conf ConnectionConfig, connection_type_id int) (*Connection, error) {
+func (client *Client) CreateDatastream(conf DatastreamConfig, datastream_type_id int) (*Datastream, error) {
 	u := *client.restURL
-	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/"
+	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/"
 
 	body, _ := json.Marshal(&conf)
-	log.Println(string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
-	resMap:= &Connection{}
+	resMap:= &Datastream{}
     if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed creating connection. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed creating datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 
@@ -65,9 +73,9 @@ func (client *Client) CreateConnection(conf ConnectionConfig, connection_type_id
 	return resMap, nil
 }
 
-func (client *Client) UpdateConnection(conf ConnectionConfig, id string, connection_type_id int) (*http.Response, error) {
+func (client *Client) UpdateDatastream(conf DatastreamConfig, id string, datastream_type_id int) (*http.Response, error) {
 	u := *client.restURL
-	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/" + id +"/"
+	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id +"/"
 
 	body, _ := json.Marshal(&conf)
 	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
@@ -84,9 +92,9 @@ func (client *Client) UpdateConnection(conf ConnectionConfig, id string, connect
 
 }
 
-func (client *Client) DeleteConnection(id string, connection_type_id int) (*http.Response, error) {
+func (client *Client) DeleteDatastream(id string, datastream_type_id int) (*http.Response, error) {
 	u := *client.restURL
-	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/" + id +"/"
+	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id +"/"
 	response, err := client.sendRequestDelete(u)
 	if err != nil {
 		return nil, err
@@ -94,7 +102,7 @@ func (client *Client) DeleteConnection(id string, connection_type_id int) (*http
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return response, errorString{"Failed deleting workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return response, errorString{"Failed deleting datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	return response, nil

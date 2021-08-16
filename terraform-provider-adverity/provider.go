@@ -24,6 +24,7 @@ func Provider() *schema.Provider {
 			"adverity_workspace":             workspace(),
 			"adverity_connection":             connection(),
 			"adverity_destination":             destination(),
+			"adverity_datastream":             datastream(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace": datasourceWorkspace(),

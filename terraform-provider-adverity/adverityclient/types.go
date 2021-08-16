@@ -38,16 +38,28 @@ type DeleteWorkspaceConfig struct {
 	StackSlug     string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
 }
 
-type ConnectionParameters struct {
+type Parameters struct {
     Name string `json:"name"`
     Value string `json:"value"`
+}
+
+type ParametersListInt struct {
+    Name string `json:"name"`
+    Value []int `json:"value"`
 }
 
 
 type ConnectionConfig struct {
 	Name         string      `json:"name"`
 	Stack        int         `json:"stack"`
-    ConnectionParameters []*ConnectionParameters `json:"parameters"`
+    Parameters []*Parameters `json:"parameters"`
+}
+
+type DatastreamConfig struct {
+	Name         string      `json:"name"`
+	Stack        int         `json:"stack"`
+    Parameters []*Parameters `json:"parameters"`
+    ParametersListInt []*ParametersListInt `json:"parameters_int"`
 }
 
 type DestinationConfig struct {
@@ -111,5 +123,34 @@ type Destination struct {
 	HeadersFormatting       int    `json:"headers_formatting"`
 	Stack                   int    `json:"stack"`
 	Auth                    int    `json:"auth"`
+}
+
+type Datastream struct {
+	ID                 int    `json:"id"`
+	CronType           string `json:"cron_type"`
+	CronInterval       int    `json:"cron_interval"`
+	CronStartOfDay     string `json:"cron_start_of_day"`
+	CronIntervalStart  int    `json:"cron_interval_start"`
+	TimeRangePreset    int    `json:"time_range_preset"`
+	DeltaType          int    `json:"delta_type"`
+	DeltaInterval      int    `json:"delta_interval"`
+	DeltaIntervalStart int    `json:"delta_interval_start"`
+	DeltaStartOfDay    string `json:"delta_start_of_day"`
+	Datatype           string `json:"datatype"`
+	Creator            string `json:"creator"`
+	DatastreamTypeID   int    `json:"datastream_type_id"`
+	AbsoluteURL        string `json:"absolute_url"`
+	Created                      string     `json:"created"`
+	Updated                      string     `json:"updated"`
+	Slug                         string        `json:"slug"`
+	Name                         string        `json:"name"`
+	Description                  string        `json:"description"`
+	Enabled                      bool          `json:"enabled"`
+	Auth                      int           `json:"auth"`
+	Frequency                 string        `json:"frequency"`
+	LastFetch                 string        `json:"last_fetch"`
+	NextRun                   string         `json:"next_run"`
+	OverviewURL               string        `json:"overview_url"`
+	StackID                   int           `json:"stack_id"`
 }
 

@@ -6,7 +6,7 @@ import (
 	"strconv"
     "encoding/json"
     "bytes"
-    "log"
+//     "log"
     "fmt"
 )
 
@@ -36,7 +36,7 @@ func (c *ConnectionConfig) MarshalJSON() ([]byte, error) {
 		"name":  c.Name,
 		"stack": fmt.Sprintf("%d", c.Stack),
 	}
-	for _, param := range c.ConnectionParameters {
+	for _, param := range c.Parameters {
 		m[param.Name] = param.Value
 	}
 	return json.Marshal(m)
@@ -47,7 +47,7 @@ func (client *Client) CreateConnection(conf ConnectionConfig, connection_type_id
 	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/"
 
 	body, _ := json.Marshal(&conf)
-	log.Println(string(body))
+// 	log.Println(string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
 	resMap:= &Connection{}
     if !responseOK(response) {
@@ -94,7 +94,7 @@ func (client *Client) DeleteConnection(id string, connection_type_id int) (*http
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return response, errorString{"Failed deleting workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return response, errorString{"Failed deleting connection. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	return response, nil
