@@ -1,14 +1,14 @@
 package adverityclient
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"encoding/json"
 	"time"
-	"bytes"
-	"fmt"
-// 	"log"
+	// 	"log"
 	"io/ioutil"
 )
 
