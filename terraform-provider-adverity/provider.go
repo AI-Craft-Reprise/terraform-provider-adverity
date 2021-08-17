@@ -1,30 +1,45 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"example.com/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
+const (
+	NAME                  = "name"
+	STACK                 = "stack"
+	DESTINATION_TYPE      = "destination_type"
+	PROJECT_ID            = "project_id"
+	DATASET_ID            = "dataset_id"
+	AUTH                  = "auth"
+	CONNECTION_TYPE_ID    = "connection_type_id"
+	CONNECTION_PARAMETERS = "connection_parameters"
+	DATALAKE_ID           = "datalake_id"
+	PARENT_ID             = "parent_id"
+	SLUG                  = "slug"
+	INSTANCE_URL          = "instance_url"
+	TOKEN                 = "token"
+)
 
 func Provider() *schema.Provider {
 	provider := &schema.Provider{
 		Schema: map[string]*schema.Schema{
-			"instance_url": {
-				Type:     schema.TypeString,
-				Required: true,
+			INSTANCE_URL: {
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Url YOUR_STACK.datatap.adverity.com",
 			},
-			"token": {
-				Type:     schema.TypeString,
-				Required: true,
+			TOKEN: {
+				Type:        schema.TypeString,
+				Required:    true,
 				Description: "Token",
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"adverity_workspace":             workspace(),
-			"adverity_connection":             connection(),
-			"adverity_destination":             destination(),
-			"adverity_datastream":             datastream(),
+			"adverity_workspace":   workspace(),
+			"adverity_connection":  connection(),
+			"adverity_destination": destination(),
+			"adverity_datastream":  datastream(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace": datasourceWorkspace(),
@@ -47,8 +62,9 @@ type config struct {
 }
 
 func providerConfigure(d *schema.ResourceData, p *schema.Provider, terraformVersion string) (interface{}, error) {
-	client, err := adverityclient.CreateClientFromLogin(d.Get("instance_url").(string),
-		d.Get("token").(string))
+	client, err := adverityclient.CreateClientFromLogin(
+		d.Get(INSTANCE_URL).(string),
+		d.Get(TOKEN).(string))
 
 	if err != nil {
 		return nil, err
@@ -57,7 +73,5 @@ func providerConfigure(d *schema.ResourceData, p *schema.Provider, terraformVers
 	config := config{
 		Client: client,
 	}
-
 	return &config, nil
-
 }

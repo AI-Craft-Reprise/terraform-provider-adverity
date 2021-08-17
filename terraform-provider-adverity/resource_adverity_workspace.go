@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"example.com/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"strconv"
-// 	"log"
+	// 	"log"
 )
 
 func workspace() *schema.Resource {
@@ -15,20 +15,20 @@ func workspace() *schema.Resource {
 		Delete: workspaceDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			NAME: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"datalake_id": &schema.Schema{
+			DATALAKE_ID: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"parent_id": &schema.Schema{
+			PARENT_ID: {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default: 1,
+				Default:  1,
 			},
-			"slug": {
+			SLUG: {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -36,77 +36,68 @@ func workspace() *schema.Resource {
 	}
 }
 
-
-
 func workspaceCreate(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	datalake_id := d.Get("datalake_id").(string)
-	parent_id := d.Get("parent_id").(int)
+	name := d.Get(NAME).(string)
+	datalakeId := d.Get(DATALAKE_ID).(string)
+	parentId := d.Get(PARENT_ID).(int)
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.CreateWorkspaceConfig{
-		Name:     name,
-		DatalakeID:    datalake_id,
-		ParentID:    parent_id,
+		Name:       name,
+		DatalakeID: datalakeId,
+		ParentID:   parentId,
 	}
 
-    res, err := client.CreateWorkspace(conf)
+	res, err := client.CreateWorkspace(conf)
 
 	if err != nil {
 		return err
 	}
 
-    d.Set("slug", res.Slug)
+	d.Set(SLUG, res.Slug)
 
 	return workspaceRead(d, m)
 }
 
-
-
-
-
 func workspaceRead(d *schema.ResourceData, m interface{}) error {
 
-    slug := d.Get("slug").(string)
-    datalake_id := d.Get("datalake_id").(string)
-    parent_id := d.Get("parent_id").(int)
-    name := d.Get("name").(string)
+	slug := d.Get(SLUG).(string)
+	datalakeId := d.Get(DATALAKE_ID).(string)
+	parentId := d.Get(PARENT_ID).(int)
+	name := d.Get(NAME).(string)
 
-    providerConfig := m.(*config)
+	providerConfig := m.(*config)
 
-    client := *providerConfig.Client
-
+	client := *providerConfig.Client
 
 	res, err := client.ReadWorkspace(slug)
 	if err != nil {
 		return err
 	}
-    d.SetId(strconv.Itoa(res.ID))
-	d.Set("datalake_id", datalake_id)
-	d.Set("parent_id", parent_id)
-	d.Set("name", name)
-
+	d.SetId(strconv.Itoa(res.ID))
+	d.Set(DATALAKE_ID, datalakeId)
+	d.Set(PARENT_ID, parentId)
+	d.Set(NAME, name)
 
 	return nil
 }
 
 func workspaceUpdate(d *schema.ResourceData, m interface{}) error {
-	parent_id := d.Get("parent_id").(int)
-    name := d.Get("name").(string)
-    slug := d.Get("slug").(string)
+	parentId := d.Get(PARENT_ID).(int)
+	name := d.Get(NAME).(string)
+	slug := d.Get(SLUG).(string)
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.UpdateWorkspaceConfig{
-	    Name:     name,
-		StackSlug:     slug,
-		ParentID:    parent_id,
-
+		Name:      name,
+		StackSlug: slug,
+		ParentID:  parentId,
 	}
 
 	_, err := client.UpdateWorkspace(conf)
@@ -121,11 +112,10 @@ func workspaceDelete(d *schema.ResourceData, m interface{}) error {
 
 	providerConfig := m.(*config)
 
-
 	client := *providerConfig.Client
-//     log.Println(d.Get("slug").(string))
+	//log.Println(d.Get(SLUG).(string))
 	conf := adverityclient.DeleteWorkspaceConfig{
-		StackSlug: d.Get("slug").(string),
+		StackSlug: d.Get(SLUG).(string),
 	}
 
 	_, err := client.DeleteWorkspace(conf)

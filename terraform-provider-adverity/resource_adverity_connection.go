@@ -1,11 +1,10 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"example.com/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"strconv"
 )
-
 
 func connection() *schema.Resource {
 	return &schema.Resource{
@@ -15,46 +14,44 @@ func connection() *schema.Resource {
 		Delete: connectionDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			NAME: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"stack": &schema.Schema{
+			STACK: {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"connection_type_id": &schema.Schema{
+			CONNECTION_TYPE_ID: {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"connection_parameters": {
-                Type:     schema.TypeMap,
-                Optional: true,
-                Elem: &schema.Schema{
-                        Type: schema.TypeString,
-                },
-            },
+			CONNECTION_PARAMETERS: {
+				Type:     schema.TypeMap,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
 		},
 	}
 }
 
-
-
 func connectionCreate(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	stack := d.Get("stack").(int)
-	connection_type_id := d.Get("connection_type_id").(int)
+	name := d.Get(NAME).(string)
+	stack := d.Get(STACK).(int)
+	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
 
-    connection_parameters, exists := d.GetOk("connection_parameters")
+	connectionParameters, exists := d.GetOk(CONNECTION_PARAMETERS)
 
-    parameters:=[]*adverityclient.Parameters{}
+	parameters := []*adverityclient.Parameters{}
 
 	if exists {
-		for n, v := range connection_parameters.(map[string]interface{}) {
-			parameter:=new(adverityclient.Parameters)
-			parameter.Value=v.(string)
-			parameter.Name=n
-			parameters=append(parameters,parameter)
+		for n, v := range connectionParameters.(map[string]interface{}) {
+			parameter := new(adverityclient.Parameters)
+			parameter.Value = v.(string)
+			parameter.Name = n
+			parameters = append(parameters, parameter)
 		}
 	}
 
@@ -63,61 +60,55 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 	client := *providerConfig.Client
 
 	conf := adverityclient.ConnectionConfig{
-		Name:     name,
-		Stack:    stack,
+		Name:       name,
+		Stack:      stack,
 		Parameters: parameters,
 	}
 
-    res, err := client.CreateConnection(conf, connection_type_id)
+	res, err := client.CreateConnection(conf, connectionTypeId)
 
 	if err != nil {
 		return err
 	}
 
-    d.SetId(strconv.Itoa(res.ID))
+	d.SetId(strconv.Itoa(res.ID))
 	//TODO here we should authorized the application or not
 
 	return connectionRead(d, m)
 }
 
-
-
-
-
 func connectionRead(d *schema.ResourceData, m interface{}) error {
 
-	connection_type_id := d.Get("connection_type_id").(int)
+	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
 
-    providerConfig := m.(*config)
+	providerConfig := m.(*config)
 
-    client := *providerConfig.Client
+	client := *providerConfig.Client
 
-
-	res, err := client.ReadConnection(d.Id(),connection_type_id)
+	res, err := client.ReadConnection(d.Id(), connectionTypeId)
 	if err != nil {
 		return err
 	}
-	d.Set("name", res.Name)
-	d.Set("stack", res.Stack)
-
+	d.Set(NAME, res.Name)
+	d.Set(STACK, res.Stack)
 
 	return nil
 }
 
 func connectionUpdate(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	stack := d.Get("stack").(int)
-	connection_type_id := d.Get("connection_type_id").(int)
+	name := d.Get(NAME).(string)
+	stack := d.Get(STACK).(int)
+	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
 
-	connection_parameters, exists := d.GetOk("connection_parameters")
+	connectionParameters, exists := d.GetOk(CONNECTION_PARAMETERS)
 
-    parameters:=[]*adverityclient.Parameters{}
-    if exists {
-		for n, v := range connection_parameters.(map[string]interface{}) {
-			parameter:=new(adverityclient.Parameters)
-			parameter.Value=v.(string)
-			parameter.Name=n
-			parameters=append(parameters,parameter)
+	parameters := []*adverityclient.Parameters{}
+	if exists {
+		for n, v := range connectionParameters.(map[string]interface{}) {
+			parameter := new(adverityclient.Parameters)
+			parameter.Value = v.(string)
+			parameter.Name = n
+			parameters = append(parameters, parameter)
 		}
 	}
 
@@ -126,12 +117,12 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 	client := *providerConfig.Client
 
 	conf := adverityclient.ConnectionConfig{
-		Name:     name,
-		Stack:    stack,
+		Name:       name,
+		Stack:      stack,
 		Parameters: parameters,
 	}
 
-	_, err := client.UpdateConnection(conf, d.Id(),connection_type_id)
+	_, err := client.UpdateConnection(conf, d.Id(), connectionTypeId)
 
 	if err != nil {
 		return err
@@ -140,13 +131,12 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func connectionDelete(d *schema.ResourceData, m interface{}) error {
-    connection_type_id := d.Get("connection_type_id").(int)
+	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
 	providerConfig := m.(*config)
-
 
 	client := *providerConfig.Client
 
-	_, err := client.DeleteConnection(d.Id(), connection_type_id)
+	_, err := client.DeleteConnection(d.Id(), connectionTypeId)
 
 	if err != nil {
 		return err
