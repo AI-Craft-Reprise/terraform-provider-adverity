@@ -7,15 +7,15 @@ import (
 func datasourceWorkspace() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			NAME: &schema.Schema{
+			NAME: {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			DATALAKE_ID: &schema.Schema{
+			DATALAKE_ID: {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
-			PARENT_ID: &schema.Schema{
+			PARENT_ID: {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
