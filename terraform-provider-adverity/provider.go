@@ -19,6 +19,7 @@ const (
 	SLUG                  = "slug"
 	INSTANCE_URL          = "instance_url"
 	TOKEN                 = "token"
+	WORKSPACE_ID          = "workspace_id"
 )
 
 func Provider() *schema.Provider {
