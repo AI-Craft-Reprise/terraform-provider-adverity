@@ -1,11 +1,11 @@
 package adverityclient
 
 import (
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-    "encoding/json"
-    "bytes"
 )
 
 func (client *Client) ReadWorkspace(id string) (*Workspace, error) {
@@ -14,8 +14,8 @@ func (client *Client) ReadWorkspace(id string) (*Workspace, error) {
 
 	response, err := client.sendRequestRead(u)
 
-	resMap:= &Workspace{}
-    if !responseOK(response) {
+	resMap := &Workspace{}
+	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		return resMap, errorString{"Failed reading workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
@@ -23,8 +23,8 @@ func (client *Client) ReadWorkspace(id string) (*Workspace, error) {
 
 	err = getJSON(response, resMap)
 	if err != nil {
-	    return nil, err
-    }
+		return nil, err
+	}
 
 	return resMap, nil
 
@@ -36,18 +36,17 @@ func (client *Client) CreateWorkspace(conf CreateWorkspaceConfig) (*Workspace, e
 
 	body, _ := json.Marshal(conf)
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
-	resMap:= &Workspace{}
-    if !responseOK(response) {
+	resMap := &Workspace{}
+	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		return resMap, errorString{"Failed creating workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
-
 	err = getJSON(response, resMap)
 	if err != nil {
-	    return nil, err
-    }
+		return nil, err
+	}
 
 	return resMap, nil
 }
@@ -87,4 +86,3 @@ func (client *Client) DeleteWorkspace(conf DeleteWorkspaceConfig) (*http.Respons
 	return response, nil
 
 }
-

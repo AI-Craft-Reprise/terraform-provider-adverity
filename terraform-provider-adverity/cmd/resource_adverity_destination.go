@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"adverity/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"strconv"
 )
 
@@ -14,27 +14,27 @@ func destination() *schema.Resource {
 		Delete: destinationDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			NAME: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"stack": &schema.Schema{
+			STACK: {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"destination_type": &schema.Schema{
+			DESTINATION_TYPE: {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"project_id": &schema.Schema{
+			PROJECT_ID: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"dataset_id": &schema.Schema{
+			DATASET_ID: {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"auth": &schema.Schema{
+			AUTH: {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
@@ -42,87 +42,80 @@ func destination() *schema.Resource {
 	}
 }
 
-
-
 func destinationCreate(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	stack := d.Get("stack").(int)
-	auth := d.Get("auth").(int)
-	destination_type := d.Get("destination_type").(int)
-	project_id := d.Get("project_id").(string)
-	dataset_id := d.Get("dataset_id").(string)
+	name := d.Get(NAME).(string)
+	stack := d.Get(STACK).(int)
+	auth := d.Get(AUTH).(int)
+	destinationType := d.Get(DESTINATION_TYPE).(int)
+	projectId := d.Get(PROJECT_ID).(string)
+	datasetId := d.Get(DATASET_ID).(string)
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.DestinationConfig{
-		Name:     name,
-		Stack: stack,
-        ProjectID: project_id,
-        DatasetID: dataset_id,
-        Auth: auth,
+		Name:      name,
+		Stack:     stack,
+		ProjectID: projectId,
+		DatasetID: datasetId,
+		Auth:      auth,
 	}
 
-    res, err := client.CreateDestination(conf, destination_type)
+	res, err := client.CreateDestination(conf, destinationType)
 
 	if err != nil {
 		return err
 	}
 
-    d.SetId(strconv.Itoa(res.ID))
+	d.SetId(strconv.Itoa(res.ID))
 	return destinationRead(d, m)
 }
 
-
-
-
-
 func destinationRead(d *schema.ResourceData, m interface{}) error {
 
-	destination_type := d.Get("destination_type").(int)
+	destinationType := d.Get(DESTINATION_TYPE).(int)
 
-    providerConfig := m.(*config)
+	providerConfig := m.(*config)
 
-    client := *providerConfig.Client
+	client := *providerConfig.Client
 
-	res, err := client.ReadDestination(d.Id(), destination_type)
+	res, err := client.ReadDestination(d.Id(), destinationType)
 	if err != nil {
 		return err
 	}
 
-    d.SetId(d.Id())
-	d.Set("project_id", res.Project)
-	d.Set("stack", res.Stack)
-	d.Set("auth", res.Auth)
-	d.Set("dataset_id", res.Dataset)
-	d.Set("name", res.Name)
-
+	d.SetId(d.Id())
+	d.Set(PROJECT_ID, res.Project)
+	d.Set(STACK, res.Stack)
+	d.Set(AUTH, res.Auth)
+	d.Set(DATASET_ID, res.Dataset)
+	d.Set(NAME, res.Name)
 
 	return nil
 }
 
 func destinationUpdate(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	stack := d.Get("stack").(int)
-	auth := d.Get("auth").(int)
-	destination_type := d.Get("destination_type").(int)
-	project_id := d.Get("project_id").(string)
-	dataset_id := d.Get("dataset_id").(string)
+	name := d.Get(NAME).(string)
+	stack := d.Get(STACK).(int)
+	auth := d.Get(AUTH).(int)
+	destinationType := d.Get(DESTINATION_TYPE).(int)
+	projectId := d.Get(PROJECT_ID).(string)
+	datasetId := d.Get(DATASET_ID).(string)
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.DestinationConfig{
-		Name:     name,
-		Stack: stack,
-        ProjectID: project_id,
-        DatasetID: dataset_id,
-        Auth: auth,
+		Name:      name,
+		Stack:     stack,
+		ProjectID: projectId,
+		DatasetID: datasetId,
+		Auth:      auth,
 	}
 
-	_, err := client.UpdateDestination(conf, destination_type, d.Id())
+	_, err := client.UpdateDestination(conf, destinationType, d.Id())
 
 	if err != nil {
 		return err
@@ -131,12 +124,12 @@ func destinationUpdate(d *schema.ResourceData, m interface{}) error {
 }
 
 func destinationDelete(d *schema.ResourceData, m interface{}) error {
-    destination_type := d.Get("destination_type").(int)
+	destinationType := d.Get(DESTINATION_TYPE).(int)
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
-	_, err := client.DeleteDestination(d.Id(), destination_type)
+	_, err := client.DeleteDestination(d.Id(), destinationType)
 
 	if err != nil {
 		return err

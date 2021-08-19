@@ -5,12 +5,11 @@ import (
 	"net/url"
 )
 
-
 type Client struct {
-	token string
-	restURL                    *url.URL
-	requestsParams             map[string]string
-	httpClient                 *http.Client
+	token          string
+	restURL        *url.URL
+	requestsParams map[string]string
+	httpClient     *http.Client
 }
 
 type errorString struct {
@@ -21,11 +20,10 @@ func (e errorString) Error() string {
 	return e.s
 }
 
-
 type CreateWorkspaceConfig struct {
-	DatalakeID      string `json:"datalake_id,omitempty url:"datalake_id,omitempty"`
-	Name      string `json:"name,omitempty" url:"name,omitempty"`
-	ParentID      int `json:"parent_id,omitempty url:"parent_id,omitempty"`
+	DatalakeID string `json:"datalake_id,omitempty url:"datalake_id,omitempty"`
+	Name       string `json:"name,omitempty" url:"name,omitempty"`
+	ParentID   int    `json:"parent_id,omitempty url:"parent_id,omitempty"`
 }
 
 type UpdateWorkspaceConfig struct {
@@ -36,39 +34,38 @@ type UpdateWorkspaceConfig struct {
 }
 
 type DeleteWorkspaceConfig struct {
-	StackSlug     string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
+	StackSlug string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
 }
 
 type Parameters struct {
-    Name string `json:"name"`
-    Value string `json:"value"`
+	Name  string `json:"name"`
+	Value string `json:"value"`
 }
 
 type ParametersListInt struct {
-    Name string `json:"name"`
-    Value []int `json:"value"`
+	Name  string `json:"name"`
+	Value []int  `json:"value"`
 }
 
-
 type ConnectionConfig struct {
-	Name         string      `json:"name"`
-	Stack        int         `json:"stack"`
-    Parameters []*Parameters `json:"parameters"`
+	Name       string        `json:"name"`
+	Stack      int           `json:"stack"`
+	Parameters []*Parameters `json:"parameters"`
 }
 
 type DatastreamConfig struct {
-	Name         string      `json:"name"`
-	Stack        int         `json:"stack"`
-    Parameters []*Parameters `json:"parameters"`
-    ParametersListInt []*ParametersListInt `json:"parameters_int"`
+	Name              string               `json:"name"`
+	Stack             int                  `json:"stack"`
+	Parameters        []*Parameters        `json:"parameters"`
+	ParametersListInt []*ParametersListInt `json:"parameters_int"`
 }
 
 type DestinationConfig struct {
-	Name         string      `json:"name"`
-	Stack        int         `json:"stack"`
-    ProjectID     string      `json:"project"`
-    DatasetID    string      `json:"dataset"`
-    Auth         int         `json:"auth"`
+	Name      string `json:"name"`
+	Stack     int    `json:"stack"`
+	ProjectID string `json:"project"`
+	DatasetID string `json:"dataset"`
+	Auth      int    `json:"auth"`
 }
 
 type Workspace struct {
@@ -95,7 +92,7 @@ type Workspace struct {
 		IsDatastreamManager bool `json:"isDatastreamManager"`
 		IsViewer            bool `json:"isViewer"`
 	} `json:"permissions"`
-	DefaultManageExtractNames bool      `json:"default_manage_extract_names"`
+	DefaultManageExtractNames bool   `json:"default_manage_extract_names"`
 	Updated                   string `json:"updated"`
 	Created                   string `json:"created"`
 }
@@ -141,18 +138,18 @@ type Datastream struct {
 	Creator            string `json:"creator"`
 	DatastreamTypeID   int    `json:"datastream_type_id"`
 	AbsoluteURL        string `json:"absolute_url"`
-	Created                      string     `json:"created"`
-	Updated                      string     `json:"updated"`
-	Slug                         string        `json:"slug"`
-	Name                         string        `json:"name"`
-	Description                  string        `json:"description"`
-	Enabled                      bool          `json:"enabled"`
-	Auth                      int           `json:"auth"`
-	Frequency                 string        `json:"frequency"`
-	LastFetch                 string        `json:"last_fetch"`
-	NextRun                   string         `json:"next_run"`
-	OverviewURL               string        `json:"overview_url"`
-	StackID                   int           `json:"stack_id"`
+	Created            string `json:"created"`
+	Updated            string `json:"updated"`
+	Slug               string `json:"slug"`
+	Name               string `json:"name"`
+	Description        string `json:"description"`
+	Enabled            bool   `json:"enabled"`
+	Auth               int    `json:"auth"`
+	Frequency          string `json:"frequency"`
+	LastFetch          string `json:"last_fetch"`
+	NextRun            string `json:"next_run"`
+	OverviewURL        string `json:"overview_url"`
+	StackID            int    `json:"stack_id"`
 }
 
 type StorageConfig struct {

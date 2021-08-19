@@ -1,11 +1,11 @@
 package adverityclient
 
 import (
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-    "encoding/json"
-    "bytes"
 )
 
 func (client *Client) ReadDestination(id string, destination_type_id int) (*Destination, error) {
@@ -14,8 +14,8 @@ func (client *Client) ReadDestination(id string, destination_type_id int) (*Dest
 
 	response, err := client.sendRequestRead(u)
 
-	resMap:= &Destination{}
-    if !responseOK(response) {
+	resMap := &Destination{}
+	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		return resMap, errorString{"Failed reading Destination. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
@@ -23,8 +23,8 @@ func (client *Client) ReadDestination(id string, destination_type_id int) (*Dest
 
 	err = getJSON(response, resMap)
 	if err != nil {
-	    return nil, err
-    }
+		return nil, err
+	}
 
 	return resMap, nil
 
@@ -32,22 +32,21 @@ func (client *Client) ReadDestination(id string, destination_type_id int) (*Dest
 
 func (client *Client) CreateDestination(conf DestinationConfig, destination_type_id int) (*Destination, error) {
 	u := *client.restURL
-	u.Path = u.Path +"target-types/" + strconv.Itoa(destination_type_id) + "/targets/"
+	u.Path = u.Path + "target-types/" + strconv.Itoa(destination_type_id) + "/targets/"
 
 	body, _ := json.Marshal(conf)
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
-	resMap:= &Destination{}
-    if !responseOK(response) {
+	resMap := &Destination{}
+	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
 		return resMap, errorString{"Failed creating Destination. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
-
 	err = getJSON(response, resMap)
 	if err != nil {
-	    return nil, err
-    }
+		return nil, err
+	}
 
 	return resMap, nil
 }
@@ -90,4 +89,3 @@ func (client *Client) DeleteDestination(id string, destination_type_id int) (*ht
 	return response, nil
 
 }
-
