@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"adverity/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"strconv"
-// 	"log"
+	// 	"log"
 )
 
 func workspace() *schema.Resource {
