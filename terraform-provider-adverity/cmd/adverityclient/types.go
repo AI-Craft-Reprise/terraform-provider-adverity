@@ -29,6 +29,7 @@ type CreateWorkspaceConfig struct {
 }
 
 type UpdateWorkspaceConfig struct {
+	DatalakeID      string `json:"datalake_id,omitempty url:"datalake_id,omitempty"`
 	ParentID      int `json:"parent_id,omitempty url:"parent_id,omitempty"`
 	StackSlug     string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
 	Name      string `json:"name,omitempty" url:"name,omitempty"`
@@ -154,3 +155,19 @@ type Datastream struct {
 	StackID                   int           `json:"stack_id"`
 }
 
+type StorageConfig struct {
+	Name       string `json:"name"`
+	Stack      int    `json:"stack,omitempty"`
+	URL        string `json:"url"`
+	Auth           int  `json:"auth"`
+}
+
+
+type Storage struct {
+	ID                 int    `json:"id"`
+	Name       string `json:"name"`
+	Stack      int    `json:"stack"`
+	URL        string `json:"url"`
+	BackupExisting bool `json:"backup_existing"`
+	Auth           int  `json:"auth"`
+}

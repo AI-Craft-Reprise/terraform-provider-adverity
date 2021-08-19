@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"strconv"
+	"adverity/adverityclient"
 // 	"log"
 // 	"reflect"
 )

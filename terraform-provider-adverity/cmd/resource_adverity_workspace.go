@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"adverity/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"strconv"
-// 	"log"
+	// 	"log"
 )
 
 func workspace() *schema.Resource {
@@ -97,6 +97,7 @@ func workspaceUpdate(d *schema.ResourceData, m interface{}) error {
 	parent_id := d.Get("parent_id").(int)
     name := d.Get("name").(string)
     slug := d.Get("slug").(string)
+	datalake_id := d.Get("datalake_id").(string)
 
 	providerConfig := m.(*config)
 
@@ -105,6 +106,7 @@ func workspaceUpdate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.UpdateWorkspaceConfig{
 	    Name:     name,
 		StackSlug:     slug,
+		DatalakeID:    datalake_id,
 		ParentID:    parent_id,
 
 	}

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"adverity/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 
@@ -23,6 +23,7 @@ func Provider() *schema.Provider {
 		ResourcesMap: map[string]*schema.Resource{
 			"adverity_workspace":             workspace(),
 			"adverity_connection":             connection(),
+			"adverity_storage":             storage(),
 			"adverity_destination":             destination(),
 			"adverity_datastream":             datastream(),
 		},
