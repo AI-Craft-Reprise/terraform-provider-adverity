@@ -47,6 +47,11 @@ type ParametersListInt struct {
 	Value []int  `json:"value"`
 }
 
+type ParametersListStr struct {
+	Name  string `json:"name"`
+	Value []string  `json:"value"`
+}
+
 type ConnectionConfig struct {
 	Name       string        `json:"name"`
 	Stack      int           `json:"stack"`
@@ -58,6 +63,7 @@ type DatastreamConfig struct {
 	Stack             int                  `json:"stack"`
 	Parameters        []*Parameters        `json:"parameters"`
 	ParametersListInt []*ParametersListInt `json:"parameters_int"`
+	ParametersListStr []*ParametersListStr `json:"parameters_str"`
 }
 
 type DestinationConfig struct {

@@ -47,6 +47,15 @@ func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 		}
 		m[p.Name] = arr_int
 	}
+
+	for _, p := range c.ParametersListStr {
+		arr_str := []string{}
+		for _, v := range p.Value {
+			arr_str = append(arr_str, v)
+		}
+		m[p.Name] = arr_str
+	}
+
 	return json.Marshal(m)
 }
 
