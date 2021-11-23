@@ -1,9 +1,10 @@
 package adverity
 
 import (
+	"strconv"
+
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"strconv"
 )
 
 func destination() *schema.Resource {
@@ -38,6 +39,10 @@ func destination() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			SCHEMA_MAPPING: {
+				Type:     schema.TypeBool,
+				Required: true,
+			},
 		},
 	}
 }
@@ -49,17 +54,19 @@ func destinationCreate(d *schema.ResourceData, m interface{}) error {
 	destinationType := d.Get(DESTINATION_TYPE).(int)
 	projectId := d.Get(PROJECT_ID).(string)
 	datasetId := d.Get(DATASET_ID).(string)
+	schemaMapping := d.Get(SCHEMA_MAPPING).(bool)
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.DestinationConfig{
-		Name:      name,
-		Stack:     stack,
-		ProjectID: projectId,
-		DatasetID: datasetId,
-		Auth:      auth,
+		Name:          name,
+		Stack:         stack,
+		ProjectID:     projectId,
+		DatasetID:     datasetId,
+		Auth:          auth,
+		SchemaMapping: schemaMapping,
 	}
 
 	res, err := client.CreateDestination(conf, destinationType)
@@ -91,6 +98,7 @@ func destinationRead(d *schema.ResourceData, m interface{}) error {
 	d.Set(AUTH, res.Auth)
 	d.Set(DATASET_ID, res.Dataset)
 	d.Set(NAME, res.Name)
+	d.Set(SCHEMA_MAPPING, res.SchemaMapping)
 
 	return nil
 }
@@ -102,17 +110,19 @@ func destinationUpdate(d *schema.ResourceData, m interface{}) error {
 	destinationType := d.Get(DESTINATION_TYPE).(int)
 	projectId := d.Get(PROJECT_ID).(string)
 	datasetId := d.Get(DATASET_ID).(string)
+	schemaMapping := d.Get(SCHEMA_MAPPING).(bool)
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.DestinationConfig{
-		Name:      name,
-		Stack:     stack,
-		ProjectID: projectId,
-		DatasetID: datasetId,
-		Auth:      auth,
+		Name:          name,
+		Stack:         stack,
+		ProjectID:     projectId,
+		DatasetID:     datasetId,
+		Auth:          auth,
+		SchemaMapping: schemaMapping,
 	}
 
 	_, err := client.UpdateDestination(conf, destinationType, d.Id())

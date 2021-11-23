@@ -67,11 +67,12 @@ type DatastreamConfig struct {
 }
 
 type DestinationConfig struct {
-	Name      string `json:"name"`
-	Stack     int    `json:"stack"`
-	ProjectID string `json:"project"`
-	DatasetID string `json:"dataset"`
-	Auth      int    `json:"auth"`
+	Name          string `json:"name"`
+	Stack         int    `json:"stack"`
+	ProjectID     string `json:"project"`
+	DatasetID     string `json:"dataset"`
+	Auth          int    `json:"auth"`
+	SchemaMapping bool   `json:"schema_mapping"`
 }
 
 type Workspace struct {
