@@ -21,20 +21,20 @@ func (e errorString) Error() string {
 }
 
 type CreateWorkspaceConfig struct {
-	DatalakeID string `json:"datalake_id,omitempty url:"datalake_id,omitempty"`
+	DatalakeID string `json:"datalake_id,omitempty" url:"datalake_id,omitempty"`
 	Name       string `json:"name,omitempty" url:"name,omitempty"`
-	ParentID   int    `json:"parent_id,omitempty url:"parent_id,omitempty"`
+	ParentID   int    `json:"parent_id,omitempty" url:"parent_id,omitempty"`
 }
 
 type UpdateWorkspaceConfig struct {
-	DatalakeID string `json:"datalake_id,omitempty url:"datalake_id,omitempty"`
-	ParentID   int    `json:"parent_id,omitempty url:"parent_id,omitempty"`
-	StackSlug  string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
+	DatalakeID string `json:"datalake_id,omitempty" url:"datalake_id,omitempty"`
+	ParentID   int    `json:"parent_id,omitempty" url:"parent_id,omitempty"`
+	StackSlug  string `json:"stack_slug,omitempty" url:"stack_slug,omitempty"`
 	Name       string `json:"name,omitempty" url:"name,omitempty"`
 }
 
 type DeleteWorkspaceConfig struct {
-	StackSlug string `json:"stack_slug,omitempty url:"stack_slug,omitempty"`
+	StackSlug string `json:"stack_slug,omitempty" url:"stack_slug,omitempty"`
 }
 
 type Parameters struct {

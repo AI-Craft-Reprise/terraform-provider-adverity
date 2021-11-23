@@ -1,9 +1,10 @@
 package adverity
 
 import (
+	"strconv"
+
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"strconv"
 )
 
 func storage() *schema.Resource {
@@ -14,19 +15,19 @@ func storage() *schema.Resource {
 		Delete: storageDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"stack": &schema.Schema{
+			"stack": {
 				Type:     schema.TypeInt,
 				Optional: true,
 			},
-			"url": &schema.Schema{
+			"url": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"auth": &schema.Schema{
+			"auth": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},

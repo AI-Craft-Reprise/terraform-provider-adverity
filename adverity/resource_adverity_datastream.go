@@ -1,9 +1,10 @@
 package adverity
 
 import (
+	"strconv"
+
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"strconv"
 	// 	"log"
 	// 	"reflect"
 )
@@ -16,15 +17,15 @@ func datastream() *schema.Resource {
 		Delete: datastreamDelete,
 
 		Schema: map[string]*schema.Schema{
-			"name": &schema.Schema{
+			"name": {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"stack": &schema.Schema{
+			"stack": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
-			"datastream_type_id": &schema.Schema{
+			"datastream_type_id": {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
