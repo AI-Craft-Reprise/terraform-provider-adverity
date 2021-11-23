@@ -23,6 +23,7 @@ description: |-
 - **name** (String)
 - **project_id** (String)
 - **stack** (Number)
+- **schema_mapping** (Bool)
 
 ### Optional
 
