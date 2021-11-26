@@ -21,6 +21,8 @@ const (
 	TOKEN                 = "token"
 	WORKSPACE_ID          = "workspace_id"
 	SCHEMA_MAPPING        = "schema_mapping"
+	CONNECTION_ID         = "connection_id"
+	AUTH_URL              = "auth_url"
 )
 
 func Provider() *schema.Provider {
@@ -46,6 +48,7 @@ func Provider() *schema.Provider {
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace": datasourceWorkspace(),
+			"adverity_auth_url":  datasourceAuthUrl(),
 		},
 	}
 
