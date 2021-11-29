@@ -15,7 +15,7 @@ func datasourceAuthUrl() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			AUTH_URL: {
+			URL: {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -38,7 +38,7 @@ func authUrlDataSource(d *schema.ResourceData, m interface{}) error {
 	}
 	d.Set(CONNECTION_TYPE_ID, connection_type_id)
 	d.Set(CONNECTION_ID, connection_id)
-	d.Set(AUTH_URL, res.URL)
+	d.Set(URL, res.URL)
 
 	return nil
 }

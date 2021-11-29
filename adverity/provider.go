@@ -22,7 +22,7 @@ const (
 	WORKSPACE_ID          = "workspace_id"
 	SCHEMA_MAPPING        = "schema_mapping"
 	CONNECTION_ID         = "connection_id"
-	AUTH_URL              = "auth_url"
+	URL                   = "url"
 )
 
 func Provider() *schema.Provider {
