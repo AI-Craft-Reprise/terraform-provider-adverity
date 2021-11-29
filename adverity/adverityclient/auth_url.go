@@ -7,7 +7,7 @@ import (
 
 func (client *Client) ReadAuthUrl(connectionTypeId int, connectionId int) (*AuthUrl, error) {
 	u := *client.restURL
-	u.Path = u.Path + "connection_types" + strconv.Itoa(connectionTypeId) + "/connections/" + strconv.Itoa(connectionId) + "/authorize"
+	u.Path = u.Path + "connection-types" + strconv.Itoa(connectionTypeId) + "/connections/" + strconv.Itoa(connectionId) + "/authorize"
 
 	response, err := client.sendRequestRead(u)
 
