@@ -22,8 +22,8 @@ description: |-
 - **destination_type** (Number)
 - **name** (String)
 - **project_id** (String)
+- **schema_mapping** (Boolean)
 - **stack** (Number)
-- **schema_mapping** (Bool)
 
 ### Optional
 

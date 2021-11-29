@@ -13,7 +13,7 @@ func datasourceAuthUrl() *schema.Resource {
 			},
 			CONNECTION_ID: {
 				Type:     schema.TypeInt,
-				Computed: true,
+				Required: true,
 			},
 			AUTH_URL: {
 				Type:     schema.TypeString,
