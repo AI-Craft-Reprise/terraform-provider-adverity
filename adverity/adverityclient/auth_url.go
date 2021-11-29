@@ -15,7 +15,7 @@ func (client *Client) ReadAuthUrl(connectionTypeId string, connectionId string) 
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading authentication URL. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading authentication URL. Sent " + u.Path + " Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	err = getJSON(response, resMap)
