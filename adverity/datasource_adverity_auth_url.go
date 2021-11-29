@@ -8,11 +8,11 @@ func datasourceAuthUrl() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			CONNECTION_TYPE_ID: {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			CONNECTION_ID: {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Required: true,
 			},
 			AUTH_URL: {
@@ -25,8 +25,8 @@ func datasourceAuthUrl() *schema.Resource {
 }
 
 func authUrlDataSource(d *schema.ResourceData, m interface{}) error {
-	connection_type_id := d.Get(CONNECTION_TYPE_ID).(int)
-	connection_id := d.Get(CONNECTION_ID).(int)
+	connection_type_id := d.Get(CONNECTION_TYPE_ID).(string)
+	connection_id := d.Get(CONNECTION_ID).(string)
 
 	providerConfig := m.(*config)
 

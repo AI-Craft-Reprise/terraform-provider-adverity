@@ -5,9 +5,9 @@ import (
 	"strconv"
 )
 
-func (client *Client) ReadAuthUrl(connectionTypeId int, connectionId int) (*AuthUrl, error) {
+func (client *Client) ReadAuthUrl(connectionTypeId string, connectionId string) (*AuthUrl, error) {
 	u := *client.restURL
-	u.Path = u.Path + "connection-types" + strconv.Itoa(connectionTypeId) + "/connections/" + strconv.Itoa(connectionId) + "/authorize/"
+	u.Path = u.Path + "connection-types" + connectionTypeId + "/connections/" + connectionId + "/authorize/"
 
 	response, err := client.sendRequestRead(u)
 

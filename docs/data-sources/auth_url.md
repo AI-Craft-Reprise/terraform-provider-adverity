@@ -17,8 +17,8 @@ description: |-
 
 ### Required
 
-- **connection_id** (Number)
-- **connection_type_id** (Number)
+- **connection_id** (String)
+- **connection_type_id** (String)
 
 ### Optional
 
