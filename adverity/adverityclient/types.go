@@ -174,3 +174,10 @@ type Storage struct {
 	BackupExisting bool   `json:"backup_existing"`
 	Auth           int    `json:"auth"`
 }
+
+type AuthUrl struct {
+	URL          string `json:"url"`
+	Status       string `json:"status"`
+	IsAuthorized bool   `json:"is_authorized`
+	IsOauth      bool   `json:"is_oauth`
+}
