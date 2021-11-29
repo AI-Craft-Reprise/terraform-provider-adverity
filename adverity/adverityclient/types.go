@@ -176,8 +176,8 @@ type Storage struct {
 }
 
 type AuthUrl struct {
-	URL          string `json:"url"`
 	Status       string `json:"status"`
 	IsAuthorized bool   `json:"is_authorized`
 	IsOauth      bool   `json:"is_oauth`
+	URL          string `json:"url"`
 }
