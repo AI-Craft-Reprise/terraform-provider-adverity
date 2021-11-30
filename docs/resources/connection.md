@@ -26,4 +26,8 @@ description: |-
 - **connection_parameters** (Map of String)
 - **id** (String) The ID of this resource.
 
+### Read-Only
+
+- **is_authorized** (Boolean)
+
 
