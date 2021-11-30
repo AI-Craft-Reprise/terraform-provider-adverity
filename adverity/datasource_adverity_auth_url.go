@@ -1,6 +1,9 @@
 package adverity
 
 import (
+	"strconv"
+	"time"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
@@ -15,7 +18,7 @@ func datasourceAuthUrl() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			AUTH_URL: {
+			URL: {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
@@ -36,9 +39,10 @@ func authUrlDataSource(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
+	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 	d.Set(CONNECTION_TYPE_ID, connection_type_id)
 	d.Set(CONNECTION_ID, connection_id)
-	d.Set(AUTH_URL, res.URL)
+	d.Set(URL, res.URL)
 
 	return nil
 }
