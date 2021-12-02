@@ -105,7 +105,7 @@ func destinationMappingUpdate(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
-	return destinationRead(d, m)
+	return destinationMappingRead(d, m)
 }
 
 func destinationMappingDelete(d *schema.ResourceData, m interface{}) error {
