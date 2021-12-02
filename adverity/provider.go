@@ -23,6 +23,7 @@ const (
 	SCHEMA_MAPPING        = "schema_mapping"
 	CONNECTION_ID         = "connection_id"
 	URL                   = "url"
+	IS_AUTHORIZED         = "is_authorized"
 )
 
 func Provider() *schema.Provider {

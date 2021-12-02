@@ -26,6 +26,6 @@ description: |-
 
 ### Read-Only
 
-- **auth_url** (String)
+- **url** (String)
 
 
