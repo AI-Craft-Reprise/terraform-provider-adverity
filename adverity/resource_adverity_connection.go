@@ -1,9 +1,10 @@
 package adverity
 
 import (
+	"strconv"
+
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"strconv"
 )
 
 func connection() *schema.Resource {
@@ -32,6 +33,10 @@ func connection() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+			},
+			IS_AUTHORIZED: {
+				Type:     schema.TypeBool,
+				Computed: true,
 			},
 		},
 	}
@@ -91,6 +96,7 @@ func connectionRead(d *schema.ResourceData, m interface{}) error {
 	}
 	d.Set(NAME, res.Name)
 	d.Set(STACK, res.Stack)
+	d.Set(IS_AUTHORIZED, res.IsAuthorized)
 
 	return nil
 }

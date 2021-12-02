@@ -26,6 +26,7 @@ const (
 	DESTINATION_ID        = "destination_id"
 	DATASTREAM_ID         = "datastream_id"
 	TABLE_NAME            = "table_name"
+	IS_AUTHORIZED         = "is_authorized"
 )
 
 func Provider() *schema.Provider {
