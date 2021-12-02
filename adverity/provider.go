@@ -23,6 +23,9 @@ const (
 	SCHEMA_MAPPING        = "schema_mapping"
 	CONNECTION_ID         = "connection_id"
 	URL                   = "url"
+	DESTINATION_ID        = "destination_id"
+	DATASTREAM_ID         = "datastream_id"
+	TABLE_NAME            = "table_name"
 	IS_AUTHORIZED         = "is_authorized"
 )
 
@@ -41,11 +44,12 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"adverity_workspace":   workspace(),
-			"adverity_connection":  connection(),
-			"adverity_storage":     storage(),
-			"adverity_destination": destination(),
-			"adverity_datastream":  datastream(),
+			"adverity_workspace":           workspace(),
+			"adverity_connection":          connection(),
+			"adverity_storage":             storage(),
+			"adverity_destination":         destination(),
+			"adverity_datastream":          datastream(),
+			"adverity_destination_mapping": destinationMapping(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace": datasourceWorkspace(),

@@ -75,6 +75,11 @@ type DestinationConfig struct {
 	SchemaMapping bool   `json:"schema_mapping"`
 }
 
+type DestinationMappingConfig struct {
+	Datastream int    `json:"datastream"`
+	TableName  string `json:"table_name"`
+}
+
 type Workspace struct {
 	AddConnectionURL string      `json:"add_connection_url"`
 	AddDatastreamURL string      `json:"add_datastream_url"`
@@ -180,4 +185,11 @@ type AuthUrl struct {
 	IsAuthorized bool   `json:"is_authorized`
 	IsOauth      bool   `json:"is_oauth`
 	URL          string `json:"url"`
+}
+
+type DestinationMapping struct {
+	ID         int    `json:"id"`
+	Target     int    `json:"target"`
+	Datastream int    `json:"datastream"`
+	TableName  string `json:"table_name"`
 }
