@@ -298,11 +298,22 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 		ParametersListStr: parameters_list_string,
 	}
 
+	enabledConf := adverityclient.DataStreamEnablingConfig{
+		Enabled: enabled,
+	}
+
 	_, err := client.UpdateDatastream(conf, d.Id(), datastream_type_id)
 
 	if err != nil {
 		return err
 	}
+
+	_, enablingErr := client.EnableDatastream(enabledConf, d.Id(), datastream_type_id)
+
+	if enablingErr != nil {
+		return err
+	}
+
 	return datastreamRead(d, m)
 }
 
