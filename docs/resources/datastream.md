@@ -18,6 +18,7 @@ description: |-
 ### Required
 
 - **datastream_type_id** (Number)
+- **enabled** (Boolean)
 - **name** (String)
 - **stack** (Number)
 

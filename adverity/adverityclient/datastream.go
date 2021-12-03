@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
 	//     "log"
 	"fmt"
 )
@@ -92,7 +93,7 @@ func (client *Client) UpdateDatastream(conf DatastreamConfig, id string, datastr
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return response, errorString{"Failed deleting workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return response, errorString{"Failed updating workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	return response, nil
@@ -114,4 +115,22 @@ func (client *Client) DeleteDatastream(id string, datastream_type_id int) (*http
 
 	return response, nil
 
+}
+
+func (client *Client) EnableDatastream(conf DataStreamEnablingConfig, id string, datastream_type_id int) (*http.Response, error) {
+	u := *client.restURL
+	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id + "/"
+
+	body, _ := json.Marshal(&conf)
+	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	if !responseOK(response) {
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		return response, errorString{"Failed enabling or disabling workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+	}
+
+	return response, nil
 }

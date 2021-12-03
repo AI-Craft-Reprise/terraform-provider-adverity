@@ -25,6 +25,10 @@ func datastream() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"enabled": {
+				Type:     schema.TypeBool,
+				Required: true,
+			},
 			"datastream_type_id": {
 				Type:     schema.TypeInt,
 				Required: true,
@@ -98,6 +102,7 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
 	datastream_type_id := d.Get("datastream_type_id").(int)
+	enabled := d.Get("enabled").(bool)
 
 	datastream_parameters, exists := d.GetOk("datastream_parameters")
 
@@ -167,9 +172,14 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.DatastreamConfig{
 		Name:              name,
 		Stack:             stack,
+		Enabled:           enabled,
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
+	}
+
+	enabledConf := adverityclient.DataStreamEnablingConfig{
+		Enabled: enabled,
 	}
 
 	res, err := client.CreateDatastream(conf, datastream_type_id)
@@ -179,6 +189,12 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
+
+	_, enablingErr := client.EnableDatastream(enabledConf, d.Id(), datastream_type_id)
+
+	if enablingErr != nil {
+		return err
+	}
 
 	return datastreamRead(d, m)
 }
@@ -197,6 +213,7 @@ func datastreamRead(d *schema.ResourceData, m interface{}) error {
 	}
 	d.Set("name", res.Name)
 	d.Set("stack", res.StackID)
+	d.Set("enabled", res.Enabled)
 
 	return nil
 }
@@ -205,6 +222,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
 	datastream_type_id := d.Get("datastream_type_id").(int)
+	enabled := d.Get("enabled").(bool)
 
 	datastream_parameters, exists := d.GetOk("datastream_parameters")
 
@@ -274,6 +292,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.DatastreamConfig{
 		Name:              name,
 		Stack:             stack,
+		Enabled:           enabled,
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
