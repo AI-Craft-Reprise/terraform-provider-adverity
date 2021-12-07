@@ -61,7 +61,6 @@ type ConnectionConfig struct {
 type DatastreamConfig struct {
 	Name              string               `json:"name"`
 	Stack             int                  `json:"stack"`
-	Enabled           bool                 `json:"enabled"`
 	Parameters        []*Parameters        `json:"parameters"`
 	ParametersListInt []*ParametersListInt `json:"parameters_int"`
 	ParametersListStr []*ParametersListStr `json:"parameters_str"`

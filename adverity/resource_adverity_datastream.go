@@ -172,7 +172,6 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.DatastreamConfig{
 		Name:              name,
 		Stack:             stack,
-		Enabled:           enabled,
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
@@ -292,7 +291,6 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.DatastreamConfig{
 		Name:              name,
 		Stack:             stack,
-		Enabled:           enabled,
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
