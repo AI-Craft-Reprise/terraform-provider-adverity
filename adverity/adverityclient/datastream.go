@@ -34,8 +34,9 @@ func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datast
 
 func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
-		"name":  c.Name,
-		"stack": fmt.Sprintf("%d", c.Stack),
+		"name":      c.Name,
+		"stack":     fmt.Sprintf("%d", c.Stack),
+		"schedules": c.Schedules,
 	}
 
 	for _, param := range c.Parameters {

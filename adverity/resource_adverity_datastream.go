@@ -94,6 +94,22 @@ func datastream() *schema.Resource {
 					},
 				},
 			},
+			"schedules": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"cron_preset": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"time_range_preset": {
+							Type:     schema.TypeInt,
+							Required: true,
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -103,6 +119,18 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	stack := d.Get("stack").(int)
 	datastream_type_id := d.Get("datastream_type_id").(int)
 	enabled := d.Get("enabled").(bool)
+
+	schedules := d.Get("schedules").([]interface{})
+	schs := []adverityclient.Schedule{}
+
+	for _, schedule := range schedules {
+		s := schedule.(map[string]interface{})
+		sch := adverityclient.Schedule{
+			CronPreset:      s["cron_preset"].(string),
+			TimeRangePreset: s["time_range_preset"].(int),
+		}
+		schs = append(schs, sch)
+	}
 
 	datastream_parameters, exists := d.GetOk("datastream_parameters")
 
@@ -175,6 +203,7 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
+		Schedules:         schs,
 	}
 
 	enabledConf := adverityclient.DataStreamEnablingConfig{
@@ -210,6 +239,10 @@ func datastreamRead(d *schema.ResourceData, m interface{}) error {
 	if err != nil {
 		return err
 	}
+	schedules := flattenSchedulesData(&res.Schedules)
+	if err := d.Set("schedules", schedules); err != nil {
+		return err
+	}
 	d.Set("name", res.Name)
 	d.Set("stack", res.StackID)
 	d.Set("enabled", res.Enabled)
@@ -222,6 +255,18 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	stack := d.Get("stack").(int)
 	datastream_type_id := d.Get("datastream_type_id").(int)
 	enabled := d.Get("enabled").(bool)
+
+	schedules := d.Get("schedules").([]interface{})
+	schs := []adverityclient.Schedule{}
+
+	for _, schedule := range schedules {
+		s := schedule.(map[string]interface{})
+		sch := adverityclient.Schedule{
+			CronPreset:      s["cron_preset"].(string),
+			TimeRangePreset: s["time_range_preset"].(int),
+		}
+		schs = append(schs, sch)
+	}
 
 	datastream_parameters, exists := d.GetOk("datastream_parameters")
 
@@ -294,6 +339,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
+		Schedules:         schs,
 	}
 
 	enabledConf := adverityclient.DataStreamEnablingConfig{
@@ -328,4 +374,19 @@ func datastreamDelete(d *schema.ResourceData, m interface{}) error {
 	}
 
 	return nil
+}
+
+func flattenSchedulesData(schedules *[]adverityclient.Schedule) []interface{} {
+	if schedules != nil {
+		schs := make([]interface{}, len(*schedules), len(*schedules))
+
+		for i, schedule := range *schedules {
+			sch := make(map[string]interface{})
+			sch["cron_preset"] = schedule.CronPreset
+			sch["time_range_preset"] = schedule.TimeRangePreset
+			schs[i] = sch
+		}
+		return schs
+	}
+	return make([]interface{}, 0)
 }
