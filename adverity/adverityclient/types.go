@@ -72,12 +72,13 @@ type DataStreamEnablingConfig struct {
 }
 
 type DestinationConfig struct {
-	Name          string `json:"name"`
-	Stack         int    `json:"stack"`
-	ProjectID     string `json:"project"`
-	DatasetID     string `json:"dataset"`
-	Auth          int    `json:"auth"`
-	SchemaMapping bool   `json:"schema_mapping"`
+	Name              string `json:"name"`
+	Stack             int    `json:"stack"`
+	ProjectID         string `json:"project"`
+	DatasetID         string `json:"dataset"`
+	Auth              int    `json:"auth"`
+	SchemaMapping     bool   `json:"schema_mapping"`
+	HeadersFormatting int    `json:"headers_formatting"`
 }
 
 type DestinationMappingConfig struct {

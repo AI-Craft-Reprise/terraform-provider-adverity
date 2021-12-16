@@ -43,6 +43,10 @@ func destination() *schema.Resource {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
+			HEADERS_FORMATTING: {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
 		},
 	}
 }
@@ -55,18 +59,24 @@ func destinationCreate(d *schema.ResourceData, m interface{}) error {
 	projectId := d.Get(PROJECT_ID).(string)
 	datasetId := d.Get(DATASET_ID).(string)
 	schemaMapping := d.Get(SCHEMA_MAPPING).(bool)
+	headersFormatting := d.Get(HEADERS_FORMATTING).(int)
+
+	if headersFormatting <= 0 || headersFormatting > 3 {
+		return errorString{"Could not create Destination. Invalid value " + strconv.Itoa(headersFormatting) + " for headers_formatting. Only 1, 2, or 3 is allowed."}
+	}
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.DestinationConfig{
-		Name:          name,
-		Stack:         stack,
-		ProjectID:     projectId,
-		DatasetID:     datasetId,
-		Auth:          auth,
-		SchemaMapping: schemaMapping,
+		Name:              name,
+		Stack:             stack,
+		ProjectID:         projectId,
+		DatasetID:         datasetId,
+		Auth:              auth,
+		SchemaMapping:     schemaMapping,
+		HeadersFormatting: headersFormatting,
 	}
 
 	res, err := client.CreateDestination(conf, destinationType)
@@ -99,6 +109,7 @@ func destinationRead(d *schema.ResourceData, m interface{}) error {
 	d.Set(DATASET_ID, res.Dataset)
 	d.Set(NAME, res.Name)
 	d.Set(SCHEMA_MAPPING, res.SchemaMapping)
+	d.Set(HEADERS_FORMATTING, res.HeadersFormatting)
 
 	return nil
 }
@@ -111,18 +122,24 @@ func destinationUpdate(d *schema.ResourceData, m interface{}) error {
 	projectId := d.Get(PROJECT_ID).(string)
 	datasetId := d.Get(DATASET_ID).(string)
 	schemaMapping := d.Get(SCHEMA_MAPPING).(bool)
+	headersFormatting := d.Get(HEADERS_FORMATTING).(int)
+
+	if headersFormatting <= 0 || headersFormatting > 3 {
+		return errorString{"Could not create Destination. Invalid value " + strconv.Itoa(headersFormatting) + " for headers_formatting. Only 1, 2, or 3 is allowed."}
+	}
 
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	conf := adverityclient.DestinationConfig{
-		Name:          name,
-		Stack:         stack,
-		ProjectID:     projectId,
-		DatasetID:     datasetId,
-		Auth:          auth,
-		SchemaMapping: schemaMapping,
+		Name:              name,
+		Stack:             stack,
+		ProjectID:         projectId,
+		DatasetID:         datasetId,
+		Auth:              auth,
+		SchemaMapping:     schemaMapping,
+		HeadersFormatting: headersFormatting,
 	}
 
 	_, err := client.UpdateDestination(conf, destinationType, d.Id())
