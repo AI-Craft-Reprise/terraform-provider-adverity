@@ -27,6 +27,7 @@ description: |-
 
 ### Optional
 
+- **headers_formatting** (Number)
 - **id** (String) The ID of this resource.
 
 
