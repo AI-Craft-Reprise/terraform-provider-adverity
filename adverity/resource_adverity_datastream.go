@@ -24,6 +24,16 @@ func datastream() *schema.Resource {
 			"stack": {
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
+			},
+			"auth": {
+				Type:     schema.TypeInt,
+				Required: true,
+				ForceNew: true,
+			},
+			"datatype": {
+				Type:     schema.TypeString,
+				Required: true,
 			},
 			"enabled": {
 				Type:     schema.TypeBool,
@@ -32,6 +42,7 @@ func datastream() *schema.Resource {
 			"datastream_type_id": {
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 			"datastream_parameters": {
 				Type:     schema.TypeMap,
@@ -117,6 +128,8 @@ func datastream() *schema.Resource {
 func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
+	auth := d.Get("auth").(int)
+	datatype := d.Get("datatype").(string)
 	datastream_type_id := d.Get("datastream_type_id").(int)
 	enabled := d.Get("enabled").(bool)
 
@@ -200,6 +213,8 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	conf := adverityclient.DatastreamConfig{
 		Name:              name,
 		Stack:             stack,
+		Auth:              auth,
+		Datatype:          datatype,
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
@@ -218,7 +233,7 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 
 	d.SetId(strconv.Itoa(res.ID))
 
-	_, enablingErr := client.EnableDatastream(enabledConf, d.Id(), datastream_type_id)
+	_, enablingErr := client.EnableDatastream(enabledConf, d.Id())
 
 	if enablingErr != nil {
 		return err
@@ -246,14 +261,14 @@ func datastreamRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("name", res.Name)
 	d.Set("stack", res.StackID)
 	d.Set("enabled", res.Enabled)
+	d.Set("auth", res.Auth)
+	d.Set("datatype", res.Datatype)
 
 	return nil
 }
 
 func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	name := d.Get("name").(string)
-	stack := d.Get("stack").(int)
-	datastream_type_id := d.Get("datastream_type_id").(int)
 	enabled := d.Get("enabled").(bool)
 
 	schedules := d.Get("schedules").([]interface{})
@@ -335,7 +350,6 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 
 	conf := adverityclient.DatastreamConfig{
 		Name:              name,
-		Stack:             stack,
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
@@ -346,13 +360,25 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 		Enabled: enabled,
 	}
 
-	_, err := client.UpdateDatastream(conf, d.Id(), datastream_type_id)
+	datatype := d.Get("datatype").(string)
+
+	datatypeConf := adverityclient.DatastreamDatatypeConfig{
+		Datatype: datatype,
+	}
+
+	_, err := client.UpdateDatastream(conf, d.Id())
 
 	if err != nil {
 		return err
 	}
 
-	_, enablingErr := client.EnableDatastream(enabledConf, d.Id(), datastream_type_id)
+	_, err = client.DataStreamChanegDatatype(datatypeConf, d.Id())
+
+	if err != nil {
+		return err
+	}
+
+	_, enablingErr := client.EnableDatastream(enabledConf, d.Id())
 
 	if enablingErr != nil {
 		return err

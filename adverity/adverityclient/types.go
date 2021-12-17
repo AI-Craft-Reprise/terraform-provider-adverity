@@ -60,7 +60,9 @@ type ConnectionConfig struct {
 
 type DatastreamConfig struct {
 	Name              string               `json:"name"`
-	Stack             int                  `json:"stack"`
+	Stack             int                  `json:"stack,omitempty"`
+	Auth              int                  `json:"auth,omitempty"`
+	Datatype          string               `json:"datatype,omitempty"`
 	Parameters        []*Parameters        `json:"parameters"`
 	ParametersListInt []*ParametersListInt `json:"parameters_int"`
 	ParametersListStr []*ParametersListStr `json:"parameters_str"`
@@ -203,4 +205,8 @@ type DestinationMapping struct {
 type Schedule struct {
 	CronPreset      string `json:"cron_preset"`
 	TimeRangePreset int    `json:"time_range_preset"`
+}
+
+type DatastreamDatatypeConfig struct {
+	Datatype string `json:"datatype"`
 }
