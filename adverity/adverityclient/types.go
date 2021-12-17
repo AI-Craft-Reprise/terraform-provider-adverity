@@ -60,11 +60,13 @@ type ConnectionConfig struct {
 
 type DatastreamConfig struct {
 	Name              string               `json:"name"`
-	Stack             int                  `json:"stack"`
-	Enabled           bool                 `json:"enabled"`
+	Stack             int                  `json:"stack,omitempty"`
+	Auth              int                  `json:"auth,omitempty"`
+	Datatype          string               `json:"datatype,omitempty"`
 	Parameters        []*Parameters        `json:"parameters"`
 	ParametersListInt []*ParametersListInt `json:"parameters_int"`
 	ParametersListStr []*ParametersListStr `json:"parameters_str"`
+	Schedules         []Schedule           `json:"schedules"`
 }
 
 type DataStreamEnablingConfig struct {
@@ -142,32 +144,33 @@ type Destination struct {
 }
 
 type Datastream struct {
-	ID                 int    `json:"id"`
-	CronType           string `json:"cron_type"`
-	CronInterval       int    `json:"cron_interval"`
-	CronStartOfDay     string `json:"cron_start_of_day"`
-	CronIntervalStart  int    `json:"cron_interval_start"`
-	TimeRangePreset    int    `json:"time_range_preset"`
-	DeltaType          int    `json:"delta_type"`
-	DeltaInterval      int    `json:"delta_interval"`
-	DeltaIntervalStart int    `json:"delta_interval_start"`
-	DeltaStartOfDay    string `json:"delta_start_of_day"`
-	Datatype           string `json:"datatype"`
-	Creator            string `json:"creator"`
-	DatastreamTypeID   int    `json:"datastream_type_id"`
-	AbsoluteURL        string `json:"absolute_url"`
-	Created            string `json:"created"`
-	Updated            string `json:"updated"`
-	Slug               string `json:"slug"`
-	Name               string `json:"name"`
-	Description        string `json:"description"`
-	Enabled            bool   `json:"enabled"`
-	Auth               int    `json:"auth"`
-	Frequency          string `json:"frequency"`
-	LastFetch          string `json:"last_fetch"`
-	NextRun            string `json:"next_run"`
-	OverviewURL        string `json:"overview_url"`
-	StackID            int    `json:"stack_id"`
+	ID                 int        `json:"id"`
+	CronType           string     `json:"cron_type"`
+	CronInterval       int        `json:"cron_interval"`
+	CronStartOfDay     string     `json:"cron_start_of_day"`
+	CronIntervalStart  int        `json:"cron_interval_start"`
+	TimeRangePreset    int        `json:"time_range_preset"`
+	DeltaType          int        `json:"delta_type"`
+	DeltaInterval      int        `json:"delta_interval"`
+	DeltaIntervalStart int        `json:"delta_interval_start"`
+	DeltaStartOfDay    string     `json:"delta_start_of_day"`
+	Datatype           string     `json:"datatype"`
+	Creator            string     `json:"creator"`
+	DatastreamTypeID   int        `json:"datastream_type_id"`
+	AbsoluteURL        string     `json:"absolute_url"`
+	Created            string     `json:"created"`
+	Updated            string     `json:"updated"`
+	Slug               string     `json:"slug"`
+	Name               string     `json:"name"`
+	Description        string     `json:"description"`
+	Enabled            bool       `json:"enabled"`
+	Auth               int        `json:"auth"`
+	Frequency          string     `json:"frequency"`
+	LastFetch          string     `json:"last_fetch"`
+	NextRun            string     `json:"next_run"`
+	OverviewURL        string     `json:"overview_url"`
+	StackID            int        `json:"stack_id"`
+	Schedules          []Schedule `json:"schedules"`
 }
 
 type StorageConfig struct {
@@ -198,4 +201,13 @@ type DestinationMapping struct {
 	Target     int    `json:"target"`
 	Datastream int    `json:"datastream"`
 	TableName  string `json:"table_name"`
+}
+
+type Schedule struct {
+	CronPreset      string `json:"cron_preset"`
+	TimeRangePreset int    `json:"time_range_preset"`
+}
+
+type DatastreamDatatypeConfig struct {
+	Datatype string `json:"datatype"`
 }

@@ -34,8 +34,18 @@ func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datast
 
 func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
-		"name":  c.Name,
-		"stack": fmt.Sprintf("%d", c.Stack),
+		"name":      c.Name,
+		"schedules": c.Schedules,
+	}
+
+	if c.Stack != 0 {
+		m["stack"] = fmt.Sprintf("%d", c.Stack)
+	}
+	if c.Auth != 0 {
+		m["auth"] = fmt.Sprintf("%d", c.Auth)
+	}
+	if c.Datatype != "" {
+		m["datatype"] = c.Datatype
 	}
 
 	for _, param := range c.Parameters {
@@ -81,11 +91,12 @@ func (client *Client) CreateDatastream(conf DatastreamConfig, datastream_type_id
 	return resMap, nil
 }
 
-func (client *Client) UpdateDatastream(conf DatastreamConfig, id string, datastream_type_id int) (*http.Response, error) {
+func (client *Client) UpdateDatastream(conf DatastreamConfig, id string) (*http.Response, error) {
 	u := *client.restURL
-	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id + "/"
+	u.Path = u.Path + "datastreams/" + id + "/"
 
 	body, _ := json.Marshal(&conf)
+
 	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
 	if err != nil {
 		return nil, err
@@ -93,7 +104,7 @@ func (client *Client) UpdateDatastream(conf DatastreamConfig, id string, datastr
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return response, errorString{"Failed updating workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return response, errorString{"Failed updating datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	return response, nil
@@ -117,9 +128,9 @@ func (client *Client) DeleteDatastream(id string, datastream_type_id int) (*http
 
 }
 
-func (client *Client) EnableDatastream(conf DataStreamEnablingConfig, id string, datastream_type_id int) (*http.Response, error) {
+func (client *Client) EnableDatastream(conf DataStreamEnablingConfig, id string) (*http.Response, error) {
 	u := *client.restURL
-	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id + "/"
+	u.Path = u.Path + "datastreams/" + id + "/"
 
 	body, _ := json.Marshal(&conf)
 	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
@@ -129,7 +140,25 @@ func (client *Client) EnableDatastream(conf DataStreamEnablingConfig, id string,
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return response, errorString{"Failed enabling or disabling workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return response, errorString{"Failed enabling or disabling datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+	}
+
+	return response, nil
+}
+
+func (client *Client) DataStreamChanegDatatype(conf DatastreamDatatypeConfig, id string) (*http.Response, error) {
+	u := *client.restURL
+	u.Path = u.Path + "datastreams/" + id + "/"
+
+	body, _ := json.Marshal(&conf)
+	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	if !responseOK(response) {
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		return response, errorString{"Failed setting datatype of Datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	return response, nil
