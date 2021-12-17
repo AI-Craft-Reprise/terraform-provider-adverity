@@ -17,7 +17,9 @@ description: |-
 
 ### Required
 
+- **auth** (Number)
 - **datastream_type_id** (Number)
+- **datatype** (String)
 - **enabled** (Boolean)
 - **name** (String)
 - **stack** (Number)
@@ -28,6 +30,7 @@ description: |-
 - **datastream_parameters** (Map of String)
 - **datastream_string_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_string_list))
 - **id** (String) The ID of this resource.
+- **schedules** (Block List) (see [below for nested schema](#nestedblock--schedules))
 
 <a id="nestedblock--datastream_list"></a>
 ### Nested Schema for `datastream_list`
@@ -60,5 +63,15 @@ Optional:
 
 - **name** (String)
 - **values** (List of String)
+
+
+
+<a id="nestedblock--schedules"></a>
+### Nested Schema for `schedules`
+
+Required:
+
+- **cron_preset** (String)
+- **time_range_preset** (Number)
 
 
