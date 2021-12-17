@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -97,8 +96,6 @@ func (client *Client) UpdateDatastream(conf DatastreamConfig, id string) (*http.
 	u.Path = u.Path + "datastreams/" + id + "/"
 
 	body, _ := json.Marshal(&conf)
-
-	log.Printf("[DEBUG] Sent request to path " + u.Path + " with body " + string(body))
 
 	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
 	if err != nil {
