@@ -18,14 +18,17 @@ func destinationMapping() *schema.Resource {
 			DESTINATION_TYPE: {
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 			DESTINATION_ID: {
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 			DATASTREAM_ID: {
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 			TABLE_NAME: {
 				Type:     schema.TypeString,
