@@ -211,3 +211,18 @@ type Schedule struct {
 type DatastreamDatatypeConfig struct {
 	Datatype string `json:"datatype"`
 }
+
+type Lookup struct {
+	Error   string      `json:"err"`
+	Results []IDMapping `json:"results"`
+}
+
+type IDMapping struct {
+	ID   int    `json:"id"`
+	Name string `json:"text"`
+}
+
+type Query struct {
+	Key   string
+	Value string
+}
