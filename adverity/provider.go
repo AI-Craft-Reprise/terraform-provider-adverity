@@ -55,6 +55,7 @@ func Provider() *schema.Provider {
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace": datasourceWorkspace(),
 			"adverity_auth_url":  datasourceAuthUrl(),
+			"adverity_lookup":    datasourceAdverityLookup(),
 		},
 	}
 
