@@ -128,7 +128,16 @@ func lookupDataSource(d *schema.ResourceData, m interface{}) error {
 		}
 	}
 
-	d.Set("filtered_list", filtered_list)
+	allFilters := make(map[int]bool)
+	list := []int{}
+	for _, item := range filtered_list {
+		if _, value := allFilters[item]; !value {
+			allFilters[item] = true
+			list = append(list, item)
+		}
+	}
+
+	d.Set("filtered_list", list)
 
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
 
