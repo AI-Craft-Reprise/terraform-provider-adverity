@@ -1,7 +1,10 @@
 package adverity
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func datasourceWorkspace() *schema.Resource {
@@ -28,12 +31,12 @@ func datasourceWorkspace() *schema.Resource {
 				Required: true,
 			},
 		},
-		Read: workspaceDataSource,
+		ReadContext: workspaceDataSource,
 	}
 }
 
-func workspaceDataSource(d *schema.ResourceData, m interface{}) error {
-
+func workspaceDataSource(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	workspace_id := d.Get(WORKSPACE_ID).(string)
 	slug := d.Get(SLUG).(string)
 
@@ -43,7 +46,7 @@ func workspaceDataSource(d *schema.ResourceData, m interface{}) error {
 
 	res, err := client.ReadWorkspace(slug)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(workspace_id)
 	d.Set(DATALAKE_ID, res.Datalake)
@@ -51,5 +54,5 @@ func workspaceDataSource(d *schema.ResourceData, m interface{}) error {
 	d.Set(NAME, res.Name)
 	d.Set(SLUG, res.Slug)
 
-	return nil
+	return diags
 }

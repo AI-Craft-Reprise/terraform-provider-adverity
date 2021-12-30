@@ -1,8 +1,11 @@
 package adverity
 
 import (
+	"context"
+
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 const (
@@ -31,7 +34,7 @@ const (
 )
 
 func Provider() *schema.Provider {
-	provider := &schema.Provider{
+	return &schema.Provider{
 		Schema: map[string]*schema.Schema{
 			INSTANCE_URL: {
 				Type:        schema.TypeString,
@@ -41,6 +44,7 @@ func Provider() *schema.Provider {
 			TOKEN: {
 				Type:        schema.TypeString,
 				Required:    true,
+				Sensitive:   true,
 				Description: "Token",
 			},
 		},
@@ -57,36 +61,24 @@ func Provider() *schema.Provider {
 			"adverity_auth_url":  datasourceAuthUrl(),
 			"adverity_lookup":    datasourceAdverityLookup(),
 		},
+		ConfigureContextFunc: providerConfigure,
 	}
-
-	provider.ConfigureFunc = func(d *schema.ResourceData) (interface{}, error) {
-		terraformVersion := provider.TerraformVersion
-		if terraformVersion == "" {
-			terraformVersion = "0.11+compatible"
-		}
-		return providerConfigure(d, provider, terraformVersion)
-	}
-
-	return provider
 }
 
 type config struct {
 	Client *adverityclient.Client
 }
 
-func providerConfigure(d *schema.ResourceData, p *schema.Provider, terraformVersion string) (interface{}, error) {
+func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}, diag.Diagnostics) {
+	var diags diag.Diagnostics
 	client, err := adverityclient.CreateClientFromLogin(
 		d.Get(INSTANCE_URL).(string),
 		d.Get(TOKEN).(string))
-
 	if err != nil {
-		return nil, err
+		return nil, diag.FromErr(err)
 	}
-
 	config := config{
 		Client: client,
 	}
-
-	return &config, nil
-
+	return &config, diags
 }

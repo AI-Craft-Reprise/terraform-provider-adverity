@@ -3,10 +3,10 @@
 page_title: "adverity Provider"
 subcategory: ""
 description: |-
-  Terraform provider for interacting with the Adverity API
+  
 ---
 
-# Adverity Provider
+# adverity Provider
 
 
 
@@ -18,4 +18,4 @@ description: |-
 ### Required
 
 - **instance_url** (String) Url YOUR_STACK.datatap.adverity.com
-- **token** (String) Token
+- **token** (String, Sensitive) Token
