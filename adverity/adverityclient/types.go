@@ -59,14 +59,43 @@ type ConnectionConfig struct {
 }
 
 type DatastreamConfig struct {
-	Name              string               `json:"name"`
-	Stack             int                  `json:"stack,omitempty"`
-	Auth              int                  `json:"auth,omitempty"`
-	Datatype          string               `json:"datatype,omitempty"`
-	Parameters        []*Parameters        `json:"parameters"`
-	ParametersListInt []*ParametersListInt `json:"parameters_int"`
-	ParametersListStr []*ParametersListStr `json:"parameters_str"`
-	Schedules         []Schedule           `json:"schedules"`
+	Name                string               `json:"name"`
+	Description         *string              `json:"description,omitempty"`
+	Stack               int                  `json:"stack"`
+	Auth                int                  `json:"auth"`
+	Datatype            string               `json:"datatype,omitempty"`
+	RetentionType       *int                 `json:"retention_type,omitempty"`
+	RetentionNumber     *int                 `json:"retention_number,omitempty"`
+	OverwriteKeyColumns *bool                `json:"overwrite_key_columns,omitempty"`
+	OverwriteDatastream *bool                `json:"overwrite_datastream,omitempty"`
+	OverwriteFileName   *bool                `json:"overwrite_filename,omitempty"`
+	IsInsightsMediaplan *bool                `json:"is_insights_mediaplan,omitempty"`
+	ManageExtractNames  *bool                `json:"manage_extract_names,omitempty"`
+	ExtractNameKeys     *string              `json:"extract_name_keys,omitempty"`
+	Parameters          []*Parameters        `json:"parameters"`
+	ParametersListInt   []*ParametersListInt `json:"parameters_int"`
+	ParametersListStr   []*ParametersListStr `json:"parameters_str"`
+	Schedules           []Schedule           `json:"schedules"`
+}
+
+type DatastreamCommonUpdateConfig struct {
+	Name                string     `json:"name,omitempty"`
+	Description         string     `json:"description"`
+	RetentionType       int        `json:"retention_type,omitempty"`
+	RetentionNumber     int        `json:"retention_number,omitempty"`
+	OverwriteKeyColumns bool       `json:"overwrite_key_columns,omitempty"`
+	OverwriteDatastream bool       `json:"overwrite_datastream,omitempty"`
+	OverwriteFileName   bool       `json:"overwrite_filename,omitempty"`
+	IsInsightsMediaplan bool       `json:"is_insights_mediaplan,omitempty"`
+	ManageExtractNames  bool       `json:"manage_extract_names,omitempty"`
+	ExtractNameKeys     string     `json:"extract_name_keys,omitempty"`
+	Schedules           []Schedule `json:"schedules,omitempty"`
+}
+
+type DatastreamSpecificConfig struct {
+	Parameters        []*Parameters
+	ParametersListInt []*ParametersListInt
+	ParametersListStr []*ParametersListStr
 }
 
 type DataStreamEnablingConfig struct {
@@ -144,33 +173,41 @@ type Destination struct {
 }
 
 type Datastream struct {
-	ID                 int        `json:"id"`
-	CronType           string     `json:"cron_type"`
-	CronInterval       int        `json:"cron_interval"`
-	CronStartOfDay     string     `json:"cron_start_of_day"`
-	CronIntervalStart  int        `json:"cron_interval_start"`
-	TimeRangePreset    int        `json:"time_range_preset"`
-	DeltaType          int        `json:"delta_type"`
-	DeltaInterval      int        `json:"delta_interval"`
-	DeltaIntervalStart int        `json:"delta_interval_start"`
-	DeltaStartOfDay    string     `json:"delta_start_of_day"`
-	Datatype           string     `json:"datatype"`
-	Creator            string     `json:"creator"`
-	DatastreamTypeID   int        `json:"datastream_type_id"`
-	AbsoluteURL        string     `json:"absolute_url"`
-	Created            string     `json:"created"`
-	Updated            string     `json:"updated"`
-	Slug               string     `json:"slug"`
-	Name               string     `json:"name"`
-	Description        string     `json:"description"`
-	Enabled            bool       `json:"enabled"`
-	Auth               int        `json:"auth"`
-	Frequency          string     `json:"frequency"`
-	LastFetch          string     `json:"last_fetch"`
-	NextRun            string     `json:"next_run"`
-	OverviewURL        string     `json:"overview_url"`
-	StackID            int        `json:"stack_id"`
-	Schedules          []Schedule `json:"schedules"`
+	ID                  int        `json:"id"`
+	CronType            string     `json:"cron_type"`
+	CronInterval        int        `json:"cron_interval"`
+	CronStartOfDay      string     `json:"cron_start_of_day"`
+	CronIntervalStart   int        `json:"cron_interval_start"`
+	TimeRangePreset     int        `json:"time_range_preset"`
+	DeltaType           int        `json:"delta_type"`
+	DeltaInterval       int        `json:"delta_interval"`
+	DeltaIntervalStart  int        `json:"delta_interval_start"`
+	DeltaStartOfDay     string     `json:"delta_start_of_day"`
+	Datatype            string     `json:"datatype"`
+	Creator             string     `json:"creator"`
+	DatastreamTypeID    int        `json:"datastream_type_id"`
+	AbsoluteURL         string     `json:"absolute_url"`
+	Created             string     `json:"created"`
+	Updated             string     `json:"updated"`
+	Slug                string     `json:"slug"`
+	Name                string     `json:"name"`
+	Description         string     `json:"description"`
+	Enabled             bool       `json:"enabled"`
+	Auth                int        `json:"auth"`
+	Frequency           string     `json:"frequency"`
+	LastFetch           string     `json:"last_fetch"`
+	NextRun             string     `json:"next_run"`
+	OverviewURL         string     `json:"overview_url"`
+	StackID             int        `json:"stack_id"`
+	Schedules           []Schedule `json:"schedules"`
+	RetentionType       int        `json:"retention_type"`
+	RetentionNumber     int        `json:"retention_number"`
+	OverwriteKeyColumns bool       `json:"overwrite_key_columns"`
+	OverwriteDatastream bool       `json:"overwrite_datastream"`
+	OverwriteFileName   bool       `json:"overwrite_filename"`
+	IsInsightsMediaplan bool       `json:"is_insights_mediaplan"`
+	ManageExtractNames  bool       `json:"manage_extract_names"`
+	ExtractNameKeys     string     `json:"extract_name_keys"`
 }
 
 type StorageConfig struct {
@@ -191,8 +228,8 @@ type Storage struct {
 
 type AuthUrl struct {
 	Status       string `json:"status"`
-	IsAuthorized bool   `json:"is_authorized`
-	IsOauth      bool   `json:"is_oauth`
+	IsAuthorized bool   `json:"is_authorized"`
+	IsOauth      bool   `json:"is_oauth"`
 	URL          string `json:"url"`
 }
 

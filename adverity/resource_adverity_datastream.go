@@ -1,12 +1,12 @@
 package adverity
 
 import (
+	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	// 	"log"
-	// 	"reflect"
 )
 
 func datastream() *schema.Resource {
@@ -20,6 +20,74 @@ func datastream() *schema.Resource {
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
+			},
+			"description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "",
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					description := val.(string)
+					if len(description) > 1000 {
+						errs = append(errs, fmt.Errorf("%q must be under 1000 characters, current length: %d", key, len(description)))
+					}
+					return
+				},
+			},
+			"retention_type": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  1,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					r_type := val.(int)
+					if r_type < 1 || r_type > 4 {
+						errs = append(errs, fmt.Errorf("%q must be an integer between 1 and 4, got %d", key, r_type))
+					}
+					return
+				},
+				Description: "Retention Type options: 1: Retain All, 2: Retain N fetches, 3: Retain N days, 4: Retain N extracts",
+			},
+			"retention_number": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					r_number := val.(int)
+					if r_number < 0 || r_number > 32767 {
+						errs = append(errs, fmt.Errorf("%q must be an integer between 0 and 32767, got %d", key, r_number))
+					}
+					return
+				},
+				Description: "The amount (N) of fetches/extracts/days to retain (raw extracts are not counted). Must be an integer greater than zero.",
+			},
+			"overwrite_key_columns": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"overwrite_datastream": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"overwrite_filename": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"is_insights_mediaplan": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"manage_extract_names": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"extract_name_keys": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ValidateFunc: func(val interface{}, key string) (warns []string, errs []error) {
+					name_key := val.(string)
+					if len(name_key) > 128 {
+						errs = append(errs, fmt.Errorf("%q must be under 128 characters, current length: %d", key, len(name_key)))
+					}
+					return
+				},
 			},
 			"stack": {
 				Type:     schema.TypeInt,
@@ -220,6 +288,45 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 		ParametersListStr: parameters_list_string,
 		Schedules:         schs,
 	}
+	if description, exists := d.GetOk("description"); exists {
+		desc := description.(string)
+		conf.Description = &desc
+	}
+	if retention_type, exists := d.GetOk("retention_type"); exists {
+		ret_type := retention_type.(int)
+		conf.RetentionType = &ret_type
+	}
+	if retention_number, exists := d.GetOk("retention_number"); exists {
+		ret_num := retention_number.(int)
+		conf.RetentionNumber = &ret_num
+	}
+	if overwrite_key_columns, exists := d.GetOk("overwrite_key_columns"); exists {
+		over_key_clm := overwrite_key_columns.(bool)
+		conf.OverwriteKeyColumns = &over_key_clm
+	}
+	if overwrite_datastream, exists := d.GetOk("overwrite_datastream"); exists {
+		over_dtstrm := overwrite_datastream.(bool)
+		conf.OverwriteDatastream = &over_dtstrm
+		log.Println("[DEBUG] Het is er wel " + strconv.FormatBool(over_dtstrm))
+	} else {
+		log.Println("[DEBUG] Het is er niet")
+	}
+	if overwrite_filename, exists := d.GetOk("overwrite_filename"); exists {
+		over_filnm := overwrite_filename.(bool)
+		conf.OverwriteFileName = &over_filnm
+	}
+	if is_insights_mediaplan, exists := d.GetOk("is_insights_mediaplan"); exists {
+		is_ins_medplan := is_insights_mediaplan.(bool)
+		conf.IsInsightsMediaplan = &is_ins_medplan
+	}
+	if manage_extract_names, exists := d.GetOk("manage_extract_names"); exists {
+		mng_extract_keys := manage_extract_names.(bool)
+		conf.ManageExtractNames = &mng_extract_keys
+	}
+	if extract_name_keys, exists := d.GetOk("extract_name_keys"); exists {
+		extract_nm_keys := extract_name_keys.(string)
+		conf.ExtractNameKeys = &extract_nm_keys
+	}
 
 	enabledConf := adverityclient.DataStreamEnablingConfig{
 		Enabled: enabled,
@@ -259,21 +366,39 @@ func datastreamRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 	d.Set("name", res.Name)
+	d.Set("description", res.Description)
 	d.Set("stack", res.StackID)
 	d.Set("enabled", res.Enabled)
 	d.Set("auth", res.Auth)
 	d.Set("datatype", res.Datatype)
+	d.Set("retention_type", res.RetentionType)
+	d.Set("retention_number", res.RetentionNumber)
+	d.Set("overwrite_key_columns", res.OverwriteKeyColumns)
+	d.Set("overwrite_datastream", res.OverwriteDatastream)
+	d.Set("overwrite_filename", res.OverwriteFileName)
+	d.Set("is_insights_mediaplan", res.IsInsightsMediaplan)
+	d.Set("manage_extract_names", res.ManageExtractNames)
+	d.Set("extract_name_keys", res.ExtractNameKeys)
 
 	return nil
 }
 
 func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
-	name := d.Get("name").(string)
-	enabled := d.Get("enabled").(bool)
+	providerConfig := m.(*config)
+	client := *providerConfig.Client
 
+	name := d.Get("name").(string)
+	description := d.Get("description").(string)
+	retention_type := d.Get("retention_type").(int)
+	retention_number := d.Get("retention_number").(int)
+	overwrite_key_columns := d.Get("overwrite_key_columns").(bool)
+	overwrite_datastream := d.Get("overwrite_datastream").(bool)
+	overwrite_filename := d.Get("overwrite_filename").(bool)
+	is_insights_mediaplan := d.Get("is_insights_mediaplan").(bool)
+	manage_extract_names := d.Get("manage_extract_names").(bool)
+	extract_name_keys := d.Get("extract_name_keys").(string)
 	schedules := d.Get("schedules").([]interface{})
 	schs := []adverityclient.Schedule{}
-
 	for _, schedule := range schedules {
 		s := schedule.(map[string]interface{})
 		sch := adverityclient.Schedule{
@@ -282,11 +407,45 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 		schs = append(schs, sch)
 	}
+	common_conf := *&adverityclient.DatastreamCommonUpdateConfig{
+		Name:                name,
+		Description:         description,
+		RetentionType:       retention_type,
+		RetentionNumber:     retention_number,
+		OverwriteKeyColumns: overwrite_key_columns,
+		OverwriteDatastream: overwrite_datastream,
+		OverwriteFileName:   overwrite_filename,
+		IsInsightsMediaplan: is_insights_mediaplan,
+		ManageExtractNames:  manage_extract_names,
+		ExtractNameKeys:     extract_name_keys,
+		Schedules:           schs,
+	}
+	_, err := client.UpdateDatastreamCommon(common_conf, d.Id())
+	if err != nil {
+		return err
+	}
 
+	datatype := d.Get("datatype").(string)
+	datatypeConf := adverityclient.DatastreamDatatypeConfig{
+		Datatype: datatype,
+	}
+	_, err = client.DataStreamChangeDatatype(datatypeConf, d.Id())
+	if err != nil {
+		return err
+	}
+
+	enabled := d.Get("enabled").(bool)
+	enabledConf := adverityclient.DataStreamEnablingConfig{
+		Enabled: enabled,
+	}
+	_, enablingErr := client.EnableDatastream(enabledConf, d.Id())
+	if enablingErr != nil {
+		return err
+	}
+
+	datastream_type_id := d.Get("datastream_type_id").(int)
 	datastream_parameters, exists := d.GetOk("datastream_parameters")
-
 	parameters := []*adverityclient.Parameters{}
-
 	if exists {
 		for n, v := range datastream_parameters.(map[string]interface{}) {
 			parameter := new(adverityclient.Parameters)
@@ -295,9 +454,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 			parameters = append(parameters, parameter)
 		}
 	}
-
 	datastream_list_map, exists := d.GetOk("datastream_list")
-
 	parameters_list_int := []*adverityclient.ParametersListInt{}
 	if exists {
 		datastreamParamSet := datastream_list_map.(*schema.Set).List()
@@ -319,9 +476,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 
 	}
-
 	datastream_list_string_map, exists := d.GetOk("datastream_string_list")
-
 	parameters_list_string := []*adverityclient.ParametersListStr{}
 	if exists {
 		datastreamParamSet := datastream_list_string_map.(*schema.Set).List()
@@ -343,44 +498,13 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 		}
 
 	}
-
-	providerConfig := m.(*config)
-
-	client := *providerConfig.Client
-
-	conf := adverityclient.DatastreamConfig{
-		Name:              name,
+	specific_conf := adverityclient.DatastreamSpecificConfig{
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
-		Schedules:         schs,
 	}
-
-	enabledConf := adverityclient.DataStreamEnablingConfig{
-		Enabled: enabled,
-	}
-
-	datatype := d.Get("datatype").(string)
-
-	datatypeConf := adverityclient.DatastreamDatatypeConfig{
-		Datatype: datatype,
-	}
-
-	_, err := client.UpdateDatastream(conf, d.Id())
-
+	_, err = client.UpdateDatastreamSpecific(specific_conf, d.Id(), datastream_type_id)
 	if err != nil {
-		return err
-	}
-
-	_, err = client.DataStreamChanegDatatype(datatypeConf, d.Id())
-
-	if err != nil {
-		return err
-	}
-
-	_, enablingErr := client.EnableDatastream(enabledConf, d.Id())
-
-	if enablingErr != nil {
 		return err
 	}
 
