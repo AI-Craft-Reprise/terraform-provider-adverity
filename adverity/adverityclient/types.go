@@ -79,16 +79,16 @@ type DatastreamConfig struct {
 }
 
 type DatastreamCommonUpdateConfig struct {
-	Name                string     `json:"name,omitempty"`
-	Description         string     `json:"description"`
-	RetentionType       int        `json:"retention_type,omitempty"`
-	RetentionNumber     int        `json:"retention_number,omitempty"`
-	OverwriteKeyColumns bool       `json:"overwrite_key_columns,omitempty"`
-	OverwriteDatastream bool       `json:"overwrite_datastream,omitempty"`
-	OverwriteFileName   bool       `json:"overwrite_filename,omitempty"`
-	IsInsightsMediaplan bool       `json:"is_insights_mediaplan,omitempty"`
-	ManageExtractNames  bool       `json:"manage_extract_names,omitempty"`
-	ExtractNameKeys     string     `json:"extract_name_keys,omitempty"`
+	Name                *string    `json:"name,omitempty"`
+	Description         *string    `json:"description,omitempty"`
+	RetentionType       *int       `json:"retention_type,omitempty"`
+	RetentionNumber     *int       `json:"retention_number,omitempty"`
+	OverwriteKeyColumns *bool      `json:"overwrite_key_columns,omitempty"`
+	OverwriteDatastream *bool      `json:"overwrite_datastream,omitempty"`
+	OverwriteFileName   *bool      `json:"overwrite_filename,omitempty"`
+	IsInsightsMediaplan *bool      `json:"is_insights_mediaplan,omitempty"`
+	ManageExtractNames  *bool      `json:"manage_extract_names,omitempty"`
+	ExtractNameKeys     *string    `json:"extract_name_keys,omitempty"`
 	Schedules           []Schedule `json:"schedules,omitempty"`
 }
 

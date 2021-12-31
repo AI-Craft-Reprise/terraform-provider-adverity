@@ -3,7 +3,6 @@ package adverity
 import (
 	"context"
 	"fmt"
-	"log"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
@@ -290,42 +289,45 @@ func datastreamCreate(ctx context.Context, d *schema.ResourceData, m interface{}
 		ParametersListStr: parameters_list_string,
 		Schedules:         schs,
 	}
-	if description, exists := d.GetOk("description"); exists {
+
+	// TODO: these next few parameters use a deprecated function (GetOkExists). There is no replacement for it yet.
+	// Once there is a replacement use that instead. Alternatively, find a way around the issue.
+	// Issue with using GetOk: GetOk returns true for the second value if the key has been set to a non-zero value.
+	// Since false for booleans and a 0 for ints is sometimes also a value we want, we can't use this method.
+	if description, exists := d.GetOkExists("description"); exists {
 		desc := description.(string)
 		conf.Description = &desc
 	}
-	if retention_type, exists := d.GetOk("retention_type"); exists {
+	if retention_type, exists := d.GetOkExists("retention_type"); exists {
 		ret_type := retention_type.(int)
 		conf.RetentionType = &ret_type
 	}
-	if retention_number, exists := d.GetOk("retention_number"); exists {
+	if retention_number, exists := d.GetOkExists("retention_number"); exists {
 		ret_num := retention_number.(int)
 		conf.RetentionNumber = &ret_num
 	}
-	if overwrite_key_columns, exists := d.GetOk("overwrite_key_columns"); exists {
+	if overwrite_key_columns, exists := d.GetOkExists("overwrite_key_columns"); exists {
 		over_key_clm := overwrite_key_columns.(bool)
 		conf.OverwriteKeyColumns = &over_key_clm
 	}
-	if overwrite_datastream, exists := d.GetOk("overwrite_datastream"); exists {
+	if overwrite_datastream, exists := d.GetOkExists("overwrite_datastream"); exists {
 		over_dtstrm := overwrite_datastream.(bool)
 		conf.OverwriteDatastream = &over_dtstrm
-		log.Println("[DEBUG] Het is er wel " + strconv.FormatBool(over_dtstrm))
 	} else {
-		log.Println("[DEBUG] Het is er niet")
 	}
-	if overwrite_filename, exists := d.GetOk("overwrite_filename"); exists {
+	if overwrite_filename, exists := d.GetOkExists("overwrite_filename"); exists {
 		over_filnm := overwrite_filename.(bool)
 		conf.OverwriteFileName = &over_filnm
 	}
-	if is_insights_mediaplan, exists := d.GetOk("is_insights_mediaplan"); exists {
+	if is_insights_mediaplan, exists := d.GetOkExists("is_insights_mediaplan"); exists {
 		is_ins_medplan := is_insights_mediaplan.(bool)
 		conf.IsInsightsMediaplan = &is_ins_medplan
 	}
-	if manage_extract_names, exists := d.GetOk("manage_extract_names"); exists {
+	if manage_extract_names, exists := d.GetOkExists("manage_extract_names"); exists {
 		mng_extract_keys := manage_extract_names.(bool)
 		conf.ManageExtractNames = &mng_extract_keys
 	}
-	if extract_name_keys, exists := d.GetOk("extract_name_keys"); exists {
+	if extract_name_keys, exists := d.GetOkExists("extract_name_keys"); exists {
 		extract_nm_keys := extract_name_keys.(string)
 		conf.ExtractNameKeys = &extract_nm_keys
 	}
@@ -389,16 +391,52 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
 
-	name := d.Get("name").(string)
-	description := d.Get("description").(string)
-	retention_type := d.Get("retention_type").(int)
-	retention_number := d.Get("retention_number").(int)
-	overwrite_key_columns := d.Get("overwrite_key_columns").(bool)
-	overwrite_datastream := d.Get("overwrite_datastream").(bool)
-	overwrite_filename := d.Get("overwrite_filename").(bool)
-	is_insights_mediaplan := d.Get("is_insights_mediaplan").(bool)
-	manage_extract_names := d.Get("manage_extract_names").(bool)
-	extract_name_keys := d.Get("extract_name_keys").(string)
+	common_conf := adverityclient.DatastreamCommonUpdateConfig{}
+	// TODO: these next few parameters use a deprecated function (GetOkExists). There is no replacement for it yet.
+	// Once there is a replacement use that instead. Alternatively, find a way around the issue.
+	// Issue with using GetOk: GetOk returns true for the second value if the key has been set to a non-zero value.
+	// Since false for booleans and a 0 for ints is sometimes also a value we want, we can't use this method.
+	if name, exists := d.GetOkExists("name"); exists {
+		nm := name.(string)
+		common_conf.Name = &nm
+	}
+	if description, exists := d.GetOkExists("description"); exists {
+		desc := description.(string)
+		common_conf.Description = &desc
+	}
+	if retention_type, exists := d.GetOkExists("retention_type"); exists {
+		ret_type := retention_type.(int)
+		common_conf.RetentionType = &ret_type
+	}
+	if retention_number, exists := d.GetOkExists("retention_number"); exists {
+		ret_num := retention_number.(int)
+		common_conf.RetentionNumber = &ret_num
+	}
+	if overwrite_key_columns, exists := d.GetOkExists("overwrite_key_columns"); exists {
+		over_key_clm := overwrite_key_columns.(bool)
+		common_conf.OverwriteKeyColumns = &over_key_clm
+	}
+	if overwrite_datastream, exists := d.GetOkExists("overwrite_datastream"); exists {
+		over_dtstrm := overwrite_datastream.(bool)
+		common_conf.OverwriteDatastream = &over_dtstrm
+	} else {
+	}
+	if overwrite_filename, exists := d.GetOkExists("overwrite_filename"); exists {
+		over_filnm := overwrite_filename.(bool)
+		common_conf.OverwriteFileName = &over_filnm
+	}
+	if is_insights_mediaplan, exists := d.GetOkExists("is_insights_mediaplan"); exists {
+		is_ins_medplan := is_insights_mediaplan.(bool)
+		common_conf.IsInsightsMediaplan = &is_ins_medplan
+	}
+	if manage_extract_names, exists := d.GetOkExists("manage_extract_names"); exists {
+		mng_extract_keys := manage_extract_names.(bool)
+		common_conf.ManageExtractNames = &mng_extract_keys
+	}
+	if extract_name_keys, exists := d.GetOkExists("extract_name_keys"); exists {
+		extract_nm_keys := extract_name_keys.(string)
+		common_conf.ExtractNameKeys = &extract_nm_keys
+	}
 	schedules := d.Get("schedules").([]interface{})
 	schs := []adverityclient.Schedule{}
 	for _, schedule := range schedules {
@@ -409,19 +447,7 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 		}
 		schs = append(schs, sch)
 	}
-	common_conf := *&adverityclient.DatastreamCommonUpdateConfig{
-		Name:                name,
-		Description:         description,
-		RetentionType:       retention_type,
-		RetentionNumber:     retention_number,
-		OverwriteKeyColumns: overwrite_key_columns,
-		OverwriteDatastream: overwrite_datastream,
-		OverwriteFileName:   overwrite_filename,
-		IsInsightsMediaplan: is_insights_mediaplan,
-		ManageExtractNames:  manage_extract_names,
-		ExtractNameKeys:     extract_name_keys,
-		Schedules:           schs,
-	}
+	common_conf.Schedules = schs
 	_, err := client.UpdateDatastreamCommon(common_conf, d.Id())
 	if err != nil {
 		return diag.FromErr(err)

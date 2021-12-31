@@ -48,39 +48,30 @@ func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	}
 	if c.Description != nil {
 		m["description"] = *c.Description
-		log.Println("[DEBUG] Description was found: " + *c.Description)
 	}
 	if c.RetentionType != nil {
 		m["retention_type"] = *c.RetentionType
-		log.Println("[DEBUG] Retention Type was found: " + strconv.Itoa(*c.RetentionType))
 	}
 	if c.RetentionNumber != nil {
 		m["retention_number"] = *c.RetentionNumber
-		log.Println("[DEBUG] Retention number was found: " + strconv.Itoa(*c.RetentionNumber))
 	}
 	if c.OverwriteKeyColumns != nil {
 		m["overwrite_key_columns"] = *c.OverwriteKeyColumns
-		log.Println("[DEBUG] Overwrite Key Columns was found: " + strconv.FormatBool(*c.OverwriteKeyColumns))
 	}
 	if c.OverwriteDatastream != nil {
 		m["overwrite_datastream"] = *c.OverwriteDatastream
-		log.Println("[DEBUG] Overwrite Datastream was found: " + strconv.FormatBool(*c.OverwriteDatastream))
 	}
 	if c.OverwriteFileName != nil {
 		m["overwrite_filename"] = *c.OverwriteFileName
-		log.Println("[DEBUG] Overwrite Filename was found: " + strconv.FormatBool(*c.OverwriteFileName))
 	}
 	if c.IsInsightsMediaplan != nil {
 		m["is_insights_mediaplan"] = *c.IsInsightsMediaplan
-		log.Println("[DEBUG] Is Insights Mediaplan was found: " + strconv.FormatBool(*c.IsInsightsMediaplan))
 	}
 	if c.ManageExtractNames != nil {
 		m["manage_extract_names"] = *c.ManageExtractNames
-		log.Println("[DEBUG] Manage Extract Names was found: " + strconv.FormatBool(*c.ManageExtractNames))
 	}
 	if c.ExtractNameKeys != nil {
 		m["extract_name_keys"] = *c.ExtractNameKeys
-		log.Println("[DEBUG] Extract Name keys was found: " + *c.ExtractNameKeys)
 	}
 
 	for _, param := range c.Parameters {
@@ -102,6 +93,29 @@ func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 		m[p.Name] = arr_str
 	}
 
+	return json.Marshal(m)
+}
+
+func (c *DatastreamSpecificConfig) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{}
+	for _, param := range c.Parameters {
+		m[param.Name] = param.Value
+	}
+	for _, p := range c.ParametersListInt {
+		arr_int := []int{}
+		for _, v := range p.Value {
+			arr_int = append(arr_int, v)
+		}
+		m[p.Name] = arr_int
+	}
+
+	for _, p := range c.ParametersListStr {
+		arr_str := []string{}
+		for _, v := range p.Value {
+			arr_str = append(arr_str, v)
+		}
+		m[p.Name] = arr_str
+	}
 	return json.Marshal(m)
 }
 
