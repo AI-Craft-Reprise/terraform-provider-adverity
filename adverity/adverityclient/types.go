@@ -254,8 +254,18 @@ type Lookup struct {
 	Results []IDMapping `json:"results"`
 }
 
+type LookupString struct {
+	Error   string            `json:"err"`
+	Results []IDMappingString `json:"results"`
+}
+
 type IDMapping struct {
 	ID   int    `json:"id"`
+	Name string `json:"text"`
+}
+
+type IDMappingString struct {
+	ID   string `json:"id"`
 	Name string `json:"text"`
 }
 

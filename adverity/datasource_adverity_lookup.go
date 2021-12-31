@@ -69,6 +69,10 @@ func datasourceAdverityLookup() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
+			"expect_string": {
+				Type:     schema.TypeBool,
+				Required: true,
+			},
 		},
 		ReadContext: dataSourceLookupRead,
 	}
@@ -89,7 +93,31 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 		}
 		params = append(params, param)
 	}
-	res, err := client.DoLookup(url, params)
+	var res *adverityclient.Lookup
+	var err error
+	if d.Get("expect_string").(bool) {
+		string_res, string_err := client.DoLookupString(url, params)
+		err = string_err
+		id_mappings := []adverityclient.IDMapping{}
+		for _, id_mapping_string := range string_res.Results {
+			id, err := strconv.Atoi(id_mapping_string.ID)
+			if err != nil {
+				return diag.FromErr(err)
+			}
+			id_mapping := adverityclient.IDMapping{
+				ID:   id,
+				Name: id_mapping_string.Name,
+			}
+			id_mappings = append(id_mappings, id_mapping)
+		}
+		res = &adverityclient.Lookup{
+			Error:   string_res.Error,
+			Results: id_mappings,
+		}
+	} else {
+		res, err = client.DoLookup(url, params)
+	}
+
 	if err != nil {
 		return diag.FromErr(err)
 	}
