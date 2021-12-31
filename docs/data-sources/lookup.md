@@ -29,7 +29,7 @@ description: |-
 
 ### Read-Only
 
-- **filtered_list** (List of Number)
+- **filtered_list** (List of String)
 - **id_mappings** (List of Object) (see [below for nested schema](#nestedatt--id_mappings))
 
 <a id="nestedblock--parameters"></a>
@@ -46,7 +46,7 @@ Required:
 
 Read-Only:
 
-- **id** (Number)
+- **id** (String)
 - **text** (String)
 
 

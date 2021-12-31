@@ -40,7 +40,7 @@ func datasourceAdverityLookup() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
-							Type:     schema.TypeInt,
+							Type:     schema.TypeString,
 							Computed: true,
 						},
 						"text": {
@@ -61,7 +61,7 @@ func datasourceAdverityLookup() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Schema{
-					Type: schema.TypeInt,
+					Type: schema.TypeString,
 				},
 			},
 			"match_exact_term": {
@@ -93,31 +93,27 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 		}
 		params = append(params, param)
 	}
-	var res *adverityclient.Lookup
+	var res *adverityclient.LookupString
 	var err error
 	if d.Get("expect_string").(bool) {
-		string_res, string_err := client.DoLookupString(url, params)
-		err = string_err
-		id_mappings := []adverityclient.IDMapping{}
-		for _, id_mapping_string := range string_res.Results {
-			id, err := strconv.Atoi(id_mapping_string.ID)
-			if err != nil {
-				return diag.FromErr(err)
-			}
-			id_mapping := adverityclient.IDMapping{
+		res, err = client.DoLookupString(url, params)
+	} else {
+		int_res, int_err := client.DoLookup(url, params)
+		err = int_err
+		id_mappings := []adverityclient.IDMappingString{}
+		for _, id_mapping_int := range int_res.Results {
+			id := strconv.Itoa(id_mapping_int.ID)
+			id_mapping := adverityclient.IDMappingString{
 				ID:   id,
-				Name: id_mapping_string.Name,
+				Name: id_mapping_int.Name,
 			}
 			id_mappings = append(id_mappings, id_mapping)
 		}
-		res = &adverityclient.Lookup{
-			Error:   string_res.Error,
+		res = &adverityclient.LookupString{
+			Error:   int_res.Error,
 			Results: id_mappings,
 		}
-	} else {
-		res, err = client.DoLookup(url, params)
 	}
-
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -129,7 +125,7 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 		return diag.FromErr(err)
 	}
 	search_terms, exists := d.GetOk("search_terms")
-	filtered_list := []int{}
+	filtered_list := []string{}
 	match_exact := d.Get("match_exact_term").(bool)
 	if exists {
 		for _, term := range search_terms.([]interface{}) {
@@ -139,7 +135,7 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 			found_match := false
 			for _, mapping := range idMappings {
 				mapping_cast := mapping.(map[string]interface{})
-				id := mapping_cast["id"].(int)
+				id := mapping_cast["id"].(string)
 				name := mapping_cast["text"].(string)
 				if name == term.(string) || (strings.Contains(strings.ToLower(name), strings.ToLower(term.(string))) && !match_exact) {
 					filtered_list = append(filtered_list, id)
@@ -151,8 +147,8 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 			}
 		}
 	}
-	allFilters := make(map[int]bool)
-	list := []int{}
+	allFilters := make(map[string]bool)
+	list := []string{}
 	for _, item := range filtered_list {
 		if _, value := allFilters[item]; !value {
 			allFilters[item] = true
@@ -164,7 +160,7 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 	return diags
 }
 
-func flattenLookup(idMappings *[]adverityclient.IDMapping) []interface{} {
+func flattenLookup(idMappings *[]adverityclient.IDMappingString) []interface{} {
 	if idMappings != nil {
 		mappings := make([]interface{}, len(*idMappings), len(*idMappings))
 
