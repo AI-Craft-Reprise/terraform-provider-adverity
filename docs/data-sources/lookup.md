@@ -17,6 +17,7 @@ description: |-
 
 ### Required
 
+- **expect_string** (Boolean)
 - **url** (String)
 
 ### Optional
