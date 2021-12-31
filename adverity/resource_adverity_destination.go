@@ -1,18 +1,20 @@
 package adverity
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func destination() *schema.Resource {
 	return &schema.Resource{
-		Create: destinationCreate,
-		Read:   destinationRead,
-		Update: destinationUpdate,
-		Delete: destinationDelete,
+		CreateContext: destinationCreate,
+		ReadContext:   destinationRead,
+		UpdateContext: destinationUpdate,
+		DeleteContext: destinationDelete,
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
@@ -51,7 +53,7 @@ func destination() *schema.Resource {
 	}
 }
 
-func destinationCreate(d *schema.ResourceData, m interface{}) error {
+func destinationCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get(NAME).(string)
 	stack := d.Get(STACK).(int)
 	auth := d.Get(AUTH).(int)
@@ -62,7 +64,7 @@ func destinationCreate(d *schema.ResourceData, m interface{}) error {
 	headersFormatting := d.Get(HEADERS_FORMATTING).(int)
 
 	if headersFormatting <= 0 || headersFormatting > 3 {
-		return errorString{"Could not create Destination. Invalid value " + strconv.Itoa(headersFormatting) + " for headers_formatting. Only 1, 2, or 3 is allowed."}
+		return diag.Errorf("Could not create Destination. Invalid value %d for headers_formatting. Only 1, 2, or 3 is allowed.", headersFormatting)
 	}
 
 	providerConfig := m.(*config)
@@ -82,15 +84,15 @@ func destinationCreate(d *schema.ResourceData, m interface{}) error {
 	res, err := client.CreateDestination(conf, destinationType)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
-	return destinationRead(d, m)
+	return destinationRead(ctx, d, m)
 }
 
-func destinationRead(d *schema.ResourceData, m interface{}) error {
-
+func destinationRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	destinationType := d.Get(DESTINATION_TYPE).(int)
 
 	providerConfig := m.(*config)
@@ -99,7 +101,7 @@ func destinationRead(d *schema.ResourceData, m interface{}) error {
 
 	res, err := client.ReadDestination(d.Id(), destinationType)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(d.Id())
@@ -111,10 +113,10 @@ func destinationRead(d *schema.ResourceData, m interface{}) error {
 	d.Set(SCHEMA_MAPPING, res.SchemaMapping)
 	d.Set(HEADERS_FORMATTING, res.HeadersFormatting)
 
-	return nil
+	return diags
 }
 
-func destinationUpdate(d *schema.ResourceData, m interface{}) error {
+func destinationUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get(NAME).(string)
 	stack := d.Get(STACK).(int)
 	auth := d.Get(AUTH).(int)
@@ -125,7 +127,7 @@ func destinationUpdate(d *schema.ResourceData, m interface{}) error {
 	headersFormatting := d.Get(HEADERS_FORMATTING).(int)
 
 	if headersFormatting <= 0 || headersFormatting > 3 {
-		return errorString{"Could not create Destination. Invalid value " + strconv.Itoa(headersFormatting) + " for headers_formatting. Only 1, 2, or 3 is allowed."}
+		return diag.Errorf("Could not create Destination. Invalid value %d for headers_formatting. Only 1, 2, or 3 is allowed.", headersFormatting)
 	}
 
 	providerConfig := m.(*config)
@@ -145,12 +147,13 @@ func destinationUpdate(d *schema.ResourceData, m interface{}) error {
 	_, err := client.UpdateDestination(conf, destinationType, d.Id())
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return destinationRead(d, m)
+	return destinationRead(ctx, d, m)
 }
 
-func destinationDelete(d *schema.ResourceData, m interface{}) error {
+func destinationDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	destinationType := d.Get(DESTINATION_TYPE).(int)
 	providerConfig := m.(*config)
 
@@ -159,8 +162,8 @@ func destinationDelete(d *schema.ResourceData, m interface{}) error {
 	_, err := client.DeleteDestination(d.Id(), destinationType)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return nil
+	return diags
 }

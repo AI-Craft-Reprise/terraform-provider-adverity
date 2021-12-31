@@ -1,18 +1,20 @@
 package adverity
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func connection() *schema.Resource {
 	return &schema.Resource{
-		Create: connectionCreate,
-		Read:   connectionRead,
-		Update: connectionUpdate,
-		Delete: connectionDelete,
+		CreateContext: connectionCreate,
+		ReadContext:   connectionRead,
+		UpdateContext: connectionUpdate,
+		DeleteContext: connectionDelete,
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
@@ -42,7 +44,7 @@ func connection() *schema.Resource {
 	}
 }
 
-func connectionCreate(d *schema.ResourceData, m interface{}) error {
+func connectionCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get(NAME).(string)
 	stack := d.Get(STACK).(int)
 	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
@@ -73,16 +75,16 @@ func connectionCreate(d *schema.ResourceData, m interface{}) error {
 	res, err := client.CreateConnection(conf, connectionTypeId)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
-	//TODO here we should authorized the application or not
 
-	return connectionRead(d, m)
+	return connectionRead(ctx, d, m)
 }
 
-func connectionRead(d *schema.ResourceData, m interface{}) error {
+func connectionRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 
 	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
 
@@ -92,16 +94,16 @@ func connectionRead(d *schema.ResourceData, m interface{}) error {
 
 	res, err := client.ReadConnection(d.Id(), connectionTypeId)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set(NAME, res.Name)
 	d.Set(STACK, res.Stack)
 	d.Set(IS_AUTHORIZED, res.IsAuthorized)
 
-	return nil
+	return diags
 }
 
-func connectionUpdate(d *schema.ResourceData, m interface{}) error {
+func connectionUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get(NAME).(string)
 	stack := d.Get(STACK).(int)
 	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
@@ -131,12 +133,13 @@ func connectionUpdate(d *schema.ResourceData, m interface{}) error {
 	_, err := client.UpdateConnection(conf, d.Id(), connectionTypeId)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return connectionRead(d, m)
+	return connectionRead(ctx, d, m)
 }
 
-func connectionDelete(d *schema.ResourceData, m interface{}) error {
+func connectionDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	connectionTypeId := d.Get(CONNECTION_TYPE_ID).(int)
 	providerConfig := m.(*config)
 
@@ -145,8 +148,8 @@ func connectionDelete(d *schema.ResourceData, m interface{}) error {
 	_, err := client.DeleteConnection(d.Id(), connectionTypeId)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return nil
+	return diags
 }

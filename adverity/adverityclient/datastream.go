@@ -3,12 +3,11 @@ package adverityclient
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
-
-	//     "log"
-	"fmt"
 )
 
 func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datastream, error) {
@@ -47,6 +46,33 @@ func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	if c.Datatype != "" {
 		m["datatype"] = c.Datatype
 	}
+	if c.Description != nil {
+		m["description"] = *c.Description
+	}
+	if c.RetentionType != nil {
+		m["retention_type"] = *c.RetentionType
+	}
+	if c.RetentionNumber != nil {
+		m["retention_number"] = *c.RetentionNumber
+	}
+	if c.OverwriteKeyColumns != nil {
+		m["overwrite_key_columns"] = *c.OverwriteKeyColumns
+	}
+	if c.OverwriteDatastream != nil {
+		m["overwrite_datastream"] = *c.OverwriteDatastream
+	}
+	if c.OverwriteFileName != nil {
+		m["overwrite_filename"] = *c.OverwriteFileName
+	}
+	if c.IsInsightsMediaplan != nil {
+		m["is_insights_mediaplan"] = *c.IsInsightsMediaplan
+	}
+	if c.ManageExtractNames != nil {
+		m["manage_extract_names"] = *c.ManageExtractNames
+	}
+	if c.ExtractNameKeys != nil {
+		m["extract_name_keys"] = *c.ExtractNameKeys
+	}
 
 	for _, param := range c.Parameters {
 		m[param.Name] = param.Value
@@ -70,11 +96,35 @@ func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	return json.Marshal(m)
 }
 
+func (c *DatastreamSpecificConfig) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{}
+	for _, param := range c.Parameters {
+		m[param.Name] = param.Value
+	}
+	for _, p := range c.ParametersListInt {
+		arr_int := []int{}
+		for _, v := range p.Value {
+			arr_int = append(arr_int, v)
+		}
+		m[p.Name] = arr_int
+	}
+
+	for _, p := range c.ParametersListStr {
+		arr_str := []string{}
+		for _, v := range p.Value {
+			arr_str = append(arr_str, v)
+		}
+		m[p.Name] = arr_str
+	}
+	return json.Marshal(m)
+}
+
 func (client *Client) CreateDatastream(conf DatastreamConfig, datastream_type_id int) (*Datastream, error) {
 	u := *client.restURL
 	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/"
 
 	body, _ := json.Marshal(&conf)
+	log.Println("[DEBUG] Sending body for create: " + string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
 	resMap := &Datastream{}
 	if !responseOK(response) {
@@ -91,6 +141,7 @@ func (client *Client) CreateDatastream(conf DatastreamConfig, datastream_type_id
 	return resMap, nil
 }
 
+// Deprecated
 func (client *Client) UpdateDatastream(conf DatastreamConfig, id string) (*http.Response, error) {
 	u := *client.restURL
 	u.Path = u.Path + "datastreams/" + id + "/"
@@ -108,7 +159,40 @@ func (client *Client) UpdateDatastream(conf DatastreamConfig, id string) (*http.
 	}
 
 	return response, nil
+}
 
+func (client *Client) UpdateDatastreamCommon(conf DatastreamCommonUpdateConfig, id string) (*http.Response, error) {
+	u := *client.restURL
+	u.Path = u.Path + "datastreams/" + id + "/"
+	body, _ := json.Marshal(&conf)
+	log.Println("[DEBUG] Sent body for common config: " + string(body))
+	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	if !responseOK(response) {
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		return response, errorString{"Failed updating datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+	}
+	return response, nil
+}
+
+func (client *Client) UpdateDatastreamSpecific(conf DatastreamSpecificConfig, id string, datastream_type_id int) (*http.Response, error) {
+	u := *client.restURL
+	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id + "/"
+	body, _ := json.Marshal(&conf)
+	log.Println("[DEBUG] Sent body for specific config: " + string(body))
+	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	if !responseOK(response) {
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		return response, errorString{"Failed updating datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+	}
+	return response, nil
 }
 
 func (client *Client) DeleteDatastream(id string, datastream_type_id int) (*http.Response, error) {
@@ -146,7 +230,7 @@ func (client *Client) EnableDatastream(conf DataStreamEnablingConfig, id string)
 	return response, nil
 }
 
-func (client *Client) DataStreamChanegDatatype(conf DatastreamDatatypeConfig, id string) (*http.Response, error) {
+func (client *Client) DataStreamChangeDatatype(conf DatastreamDatatypeConfig, id string) (*http.Response, error) {
 	u := *client.restURL
 	u.Path = u.Path + "datastreams/" + id + "/"
 

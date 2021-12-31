@@ -1,18 +1,20 @@
 package adverity
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func storage() *schema.Resource {
 	return &schema.Resource{
-		Create: storageCreate,
-		Read:   storageRead,
-		Update: storageUpdate,
-		Delete: storageDelete,
+		CreateContext: storageCreate,
+		ReadContext:   storageRead,
+		UpdateContext: storageUpdate,
+		DeleteContext: storageDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -35,7 +37,7 @@ func storage() *schema.Resource {
 	}
 }
 
-func storageCreate(d *schema.ResourceData, m interface{}) error {
+func storageCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	url := d.Get("url").(string)
 	stack := d.Get("stack").(int)
@@ -55,33 +57,33 @@ func storageCreate(d *schema.ResourceData, m interface{}) error {
 	res, err := client.CreateStorage(conf)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
 
-	return storageRead(d, m)
+	return storageRead(ctx, d, m)
 }
 
-func storageRead(d *schema.ResourceData, m interface{}) error {
-
+func storageRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
 
 	res, err := client.ReadStorage(d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("name", res.Name)
 	d.Set("stack", res.Stack)
 	d.Set("auth", res.Auth)
 	d.Set("url", res.URL)
 
-	return nil
+	return diags
 }
 
-func storageUpdate(d *schema.ResourceData, m interface{}) error {
+func storageUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	url := d.Get("url").(string)
 	stack := d.Get("stack").(int)
@@ -101,12 +103,13 @@ func storageUpdate(d *schema.ResourceData, m interface{}) error {
 	_, err := client.UpdateStorage(conf, d.Id())
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return connectionRead(d, m)
+	return connectionRead(ctx, d, m)
 }
 
-func storageDelete(d *schema.ResourceData, m interface{}) error {
+func storageDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 
 	providerConfig := m.(*config)
 
@@ -115,8 +118,8 @@ func storageDelete(d *schema.ResourceData, m interface{}) error {
 	_, err := client.DeleteStorage(d.Id())
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return nil
+	return diags
 }

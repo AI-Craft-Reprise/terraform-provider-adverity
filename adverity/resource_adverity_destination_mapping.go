@@ -1,18 +1,20 @@
 package adverity
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func destinationMapping() *schema.Resource {
 	return &schema.Resource{
-		Create: destinationMappingCreate,
-		Read:   destinationMappingRead,
-		Update: destinationMappingUpdate,
-		Delete: destinationMappingDelete,
+		CreateContext: destinationMappingCreate,
+		ReadContext:   destinationMappingRead,
+		UpdateContext: destinationMappingUpdate,
+		DeleteContext: destinationMappingDelete,
 
 		Schema: map[string]*schema.Schema{
 			DESTINATION_TYPE: {
@@ -38,7 +40,7 @@ func destinationMapping() *schema.Resource {
 	}
 }
 
-func destinationMappingCreate(d *schema.ResourceData, m interface{}) error {
+func destinationMappingCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	destination_type := d.Get(DESTINATION_TYPE).(int)
 	destination_id := d.Get(DESTINATION_ID).(int)
 	datastream_id := d.Get(DATASTREAM_ID).(int)
@@ -55,25 +57,26 @@ func destinationMappingCreate(d *schema.ResourceData, m interface{}) error {
 	res, err := client.CreateDestinationMapping(conf, destination_type, destination_id)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
-	return destinationMappingRead(d, m)
+	return destinationMappingRead(ctx, d, m)
 }
 
-func destinationMappingRead(d *schema.ResourceData, m interface{}) error {
+func destinationMappingRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	destination_type := d.Get(DESTINATION_TYPE).(int)
 	destination_id := d.Get(DESTINATION_ID).(int)
 	id, strErr := strconv.Atoi(d.Id())
 	if strErr != nil {
-		return strErr
+		return diag.FromErr(strErr)
 	}
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
 	res, err := client.ReadDestinationMapping(id, destination_type, destination_id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(d.Id())
@@ -82,17 +85,17 @@ func destinationMappingRead(d *schema.ResourceData, m interface{}) error {
 	d.Set(DATASTREAM_ID, res.Datastream)
 	d.Set(TABLE_NAME, res.TableName)
 
-	return nil
+	return diags
 }
 
-func destinationMappingUpdate(d *schema.ResourceData, m interface{}) error {
+func destinationMappingUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	destination_type := d.Get(DESTINATION_TYPE).(int)
 	destination_id := d.Get(DESTINATION_ID).(int)
 	datastream_id := d.Get(DATASTREAM_ID).(int)
 	table_name := d.Get(TABLE_NAME).(string)
 	id, strErr := strconv.Atoi(d.Id())
 	if strErr != nil {
-		return strErr
+		return diag.FromErr(strErr)
 	}
 
 	providerConfig := m.(*config)
@@ -106,23 +109,27 @@ func destinationMappingUpdate(d *schema.ResourceData, m interface{}) error {
 	_, err := client.UpdateDestinationMapping(conf, destination_type, destination_id, id)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return destinationMappingRead(d, m)
+	return destinationMappingRead(ctx, d, m)
 }
 
-func destinationMappingDelete(d *schema.ResourceData, m interface{}) error {
+func destinationMappingDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	destination_type := d.Get(DESTINATION_TYPE).(int)
 	destination_id := d.Get(DESTINATION_ID).(int)
 	id, strErr := strconv.Atoi(d.Id())
 	if strErr != nil {
-		return strErr
+		return diag.FromErr(strErr)
 	}
 
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
 
 	_, err := client.DeleteDestinationMapping(id, destination_type, destination_id)
+	if err != nil {
+		return diag.FromErr(err)
+	}
 
-	return err
+	return diags
 }

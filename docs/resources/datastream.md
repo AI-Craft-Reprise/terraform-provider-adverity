@@ -29,7 +29,16 @@ description: |-
 - **datastream_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_list))
 - **datastream_parameters** (Map of String)
 - **datastream_string_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_string_list))
+- **description** (String)
+- **extract_name_keys** (String)
 - **id** (String) The ID of this resource.
+- **is_insights_mediaplan** (Boolean)
+- **manage_extract_names** (Boolean)
+- **overwrite_datastream** (Boolean)
+- **overwrite_filename** (Boolean)
+- **overwrite_key_columns** (Boolean)
+- **retention_number** (Number) The amount (N) of fetches/extracts/days to retain (raw extracts are not counted). Must be an integer greater than zero.
+- **retention_type** (Number) Retention Type options: 1: Retain All, 2: Retain N fetches, 3: Retain N days, 4: Retain N extracts
 - **schedules** (Block List) (see [below for nested schema](#nestedblock--schedules))
 
 <a id="nestedblock--datastream_list"></a>
