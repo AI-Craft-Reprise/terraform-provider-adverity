@@ -1,20 +1,22 @@
 package adverity
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
 
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func datastream() *schema.Resource {
 	return &schema.Resource{
-		Create: datastreamCreate,
-		Read:   datastreamRead,
-		Update: datastreamUpdate,
-		Delete: datastreamDelete,
+		CreateContext: datastreamCreate,
+		ReadContext:   datastreamRead,
+		UpdateContext: datastreamUpdate,
+		DeleteContext: datastreamDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -193,7 +195,7 @@ func datastream() *schema.Resource {
 	}
 }
 
-func datastreamCreate(d *schema.ResourceData, m interface{}) error {
+func datastreamCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get("name").(string)
 	stack := d.Get("stack").(int)
 	auth := d.Get("auth").(int)
@@ -335,7 +337,7 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	res, err := client.CreateDatastream(conf, datastream_type_id)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
@@ -343,14 +345,14 @@ func datastreamCreate(d *schema.ResourceData, m interface{}) error {
 	_, enablingErr := client.EnableDatastream(enabledConf, d.Id())
 
 	if enablingErr != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return datastreamRead(d, m)
+	return datastreamRead(ctx, d, m)
 }
 
-func datastreamRead(d *schema.ResourceData, m interface{}) error {
-
+func datastreamRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	datastream_type_id := d.Get("datastream_type_id").(int)
 
 	providerConfig := m.(*config)
@@ -359,11 +361,11 @@ func datastreamRead(d *schema.ResourceData, m interface{}) error {
 
 	res, err := client.ReadDatastream(d.Id(), datastream_type_id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	schedules := flattenSchedulesData(&res.Schedules)
 	if err := d.Set("schedules", schedules); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.Set("name", res.Name)
 	d.Set("description", res.Description)
@@ -380,10 +382,10 @@ func datastreamRead(d *schema.ResourceData, m interface{}) error {
 	d.Set("manage_extract_names", res.ManageExtractNames)
 	d.Set("extract_name_keys", res.ExtractNameKeys)
 
-	return nil
+	return diags
 }
 
-func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
+func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
 
@@ -422,7 +424,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 	_, err := client.UpdateDatastreamCommon(common_conf, d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	datatype := d.Get("datatype").(string)
@@ -431,7 +433,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 	_, err = client.DataStreamChangeDatatype(datatypeConf, d.Id())
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	enabled := d.Get("enabled").(bool)
@@ -440,7 +442,7 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 	_, enablingErr := client.EnableDatastream(enabledConf, d.Id())
 	if enablingErr != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	datastream_type_id := d.Get("datastream_type_id").(int)
@@ -505,13 +507,14 @@ func datastreamUpdate(d *schema.ResourceData, m interface{}) error {
 	}
 	_, err = client.UpdateDatastreamSpecific(specific_conf, d.Id(), datastream_type_id)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return datastreamRead(d, m)
+	return datastreamRead(ctx, d, m)
 }
 
-func datastreamDelete(d *schema.ResourceData, m interface{}) error {
+func datastreamDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	datastream_type_id := d.Get("datastream_type_id").(int)
 	providerConfig := m.(*config)
 
@@ -520,10 +523,10 @@ func datastreamDelete(d *schema.ResourceData, m interface{}) error {
 	_, err := client.DeleteDatastream(d.Id(), datastream_type_id)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return nil
+	return diags
 }
 
 func flattenSchedulesData(schedules *[]adverityclient.Schedule) []interface{} {

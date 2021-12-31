@@ -1,12 +1,14 @@
 package adverity
 
 import (
+	"context"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func datasourceAdverityLookup() *schema.Resource {
@@ -68,19 +70,17 @@ func datasourceAdverityLookup() *schema.Resource {
 				Default:  false,
 			},
 		},
-		Read: lookupDataSource,
+		ReadContext: dataSourceLookupRead,
 	}
 }
 
-func lookupDataSource(d *schema.ResourceData, m interface{}) error {
+func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	parameters := d.Get("parameters").([]interface{})
 	url := d.Get("url").(string)
-
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
-
 	params := []adverityclient.Query{}
-
 	for _, parameter := range parameters {
 		p := parameter.(map[string]interface{})
 		param := adverityclient.Query{
@@ -89,28 +89,24 @@ func lookupDataSource(d *schema.ResourceData, m interface{}) error {
 		}
 		params = append(params, param)
 	}
-
 	res, err := client.DoLookup(url, params)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	if res.Error != "nil" {
-		return errorString{"Error while doing lookup: " + res.Error}
+		return diag.Errorf("Error while doing lookup: %s", res.Error)
 	}
-
 	idMappings := flattenLookup(&res.Results)
 	if err := d.Set("id_mappings", idMappings); err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-
 	search_terms, exists := d.GetOk("search_terms")
 	filtered_list := []int{}
 	match_exact := d.Get("match_exact_term").(bool)
-
 	if exists {
 		for _, term := range search_terms.([]interface{}) {
 			if term == nil {
-				return errorString{"Failed doing lookup: empty string not permitted"}
+				return diag.Errorf("Failed doing lookup: empty string not permitted")
 			}
 			found_match := false
 			for _, mapping := range idMappings {
@@ -123,11 +119,10 @@ func lookupDataSource(d *schema.ResourceData, m interface{}) error {
 				}
 			}
 			if !found_match {
-				return errorString{"Error while doing lookup: could not find a match for term \"" + term.(string) + "\""}
+				return diag.Errorf("Error while doing lookup: could not find a match for term \"%s\"", term.(string))
 			}
 		}
 	}
-
 	allFilters := make(map[int]bool)
 	list := []int{}
 	for _, item := range filtered_list {
@@ -136,12 +131,9 @@ func lookupDataSource(d *schema.ResourceData, m interface{}) error {
 			list = append(list, item)
 		}
 	}
-
 	d.Set("filtered_list", list)
-
 	d.SetId(strconv.FormatInt(time.Now().Unix(), 10))
-
-	return nil
+	return diags
 }
 
 func flattenLookup(idMappings *[]adverityclient.IDMapping) []interface{} {

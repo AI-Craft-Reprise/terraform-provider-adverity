@@ -8,6 +8,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"time"
+
 	// 	"log"
 	"io/ioutil"
 )
@@ -86,6 +87,26 @@ func (client *Client) sendRequestRead(u url.URL) (*http.Response, error) {
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
 	req.Header.Add("Content-Type", "application/json")
+
+	response, err := client.httpClient.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+	return response, err
+}
+
+func (client *Client) sendRequestQuery(u url.URL, queries []Query) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
+
+	q := req.URL.Query()
+
+	for _, query := range queries {
+		q.Add(query.Key, query.Value)
+	}
+
+	req.URL.RawQuery = q.Encode()
 
 	response, err := client.httpClient.Do(req)
 

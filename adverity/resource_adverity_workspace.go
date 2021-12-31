@@ -1,18 +1,21 @@
 package adverity
 
 import (
-	"github.com/fourcast/adverityclient"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"context"
 	"strconv"
+
+	"github.com/fourcast/adverityclient"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	// 	"log"
 )
 
 func workspace() *schema.Resource {
 	return &schema.Resource{
-		Create: workspaceCreate,
-		Read:   workspaceRead,
-		Update: workspaceUpdate,
-		Delete: workspaceDelete,
+		CreateContext: workspaceCreate,
+		ReadContext:   workspaceRead,
+		UpdateContext: workspaceUpdate,
+		DeleteContext: workspaceDelete,
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
@@ -36,7 +39,7 @@ func workspace() *schema.Resource {
 	}
 }
 
-func workspaceCreate(d *schema.ResourceData, m interface{}) error {
+func workspaceCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	name := d.Get(NAME).(string)
 	datalakeId := d.Get(DATALAKE_ID).(string)
 	parentId := d.Get(PARENT_ID).(int)
@@ -54,15 +57,16 @@ func workspaceCreate(d *schema.ResourceData, m interface{}) error {
 	res, err := client.CreateWorkspace(conf)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
 	d.Set(SLUG, res.Slug)
 
-	return workspaceRead(d, m)
+	return workspaceRead(ctx, d, m)
 }
 
-func workspaceRead(d *schema.ResourceData, m interface{}) error {
+func workspaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 
 	slug := d.Get(SLUG).(string)
 	datalakeId := d.Get(DATALAKE_ID).(string)
@@ -75,17 +79,17 @@ func workspaceRead(d *schema.ResourceData, m interface{}) error {
 
 	res, err := client.ReadWorkspace(slug)
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 	d.SetId(strconv.Itoa(res.ID))
 	d.Set(DATALAKE_ID, datalakeId)
 	d.Set(PARENT_ID, parentId)
 	d.Set(NAME, name)
 
-	return nil
+	return diags
 }
 
-func workspaceUpdate(d *schema.ResourceData, m interface{}) error {
+func workspaceUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	parentId := d.Get(PARENT_ID).(int)
 	name := d.Get(NAME).(string)
 	slug := d.Get(SLUG).(string)
@@ -105,17 +109,16 @@ func workspaceUpdate(d *schema.ResourceData, m interface{}) error {
 	_, err := client.UpdateWorkspace(conf)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
-	return workspaceRead(d, m)
+	return workspaceRead(ctx, d, m)
 }
 
-func workspaceDelete(d *schema.ResourceData, m interface{}) error {
-
+func workspaceDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
 	providerConfig := m.(*config)
 
 	client := *providerConfig.Client
-	//log.Println(d.Get(SLUG).(string))
 	conf := adverityclient.DeleteWorkspaceConfig{
 		StackSlug: d.Get(SLUG).(string),
 	}
@@ -123,8 +126,8 @@ func workspaceDelete(d *schema.ResourceData, m interface{}) error {
 	_, err := client.DeleteWorkspace(conf)
 
 	if err != nil {
-		return err
+		return diag.FromErr(err)
 	}
 
-	return nil
+	return diags
 }
