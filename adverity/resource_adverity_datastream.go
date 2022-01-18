@@ -287,7 +287,8 @@ func datastreamCreate(ctx context.Context, d *schema.ResourceData, m interface{}
 		Parameters:        parameters,
 		ParametersListInt: parameters_list_int,
 		ParametersListStr: parameters_list_string,
-		Schedules:         schs,
+		// Currently passing schedules is bugged on Adverity side, and will throw an internal server error if passed through the API
+		// Schedules: &schs,
 	}
 
 	// TODO: these next few parameters use a deprecated function (GetOkExists). There is no replacement for it yet.
@@ -447,7 +448,8 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 		}
 		schs = append(schs, sch)
 	}
-	common_conf.Schedules = schs
+	// Currently passing schedules is bugged on Adverity side, and will throw an internal server error if passed through the API
+	// common_conf.Schedules = schs
 	_, err := client.UpdateDatastreamCommon(common_conf, d.Id())
 	if err != nil {
 		return diag.FromErr(err)

@@ -33,10 +33,11 @@ func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datast
 
 func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
-		"name":      c.Name,
-		"schedules": c.Schedules,
+		"name": c.Name,
 	}
-
+	if c.Schedules != nil {
+		m["schedules"] = c.Schedules
+	}
 	if c.Stack != 0 {
 		m["stack"] = fmt.Sprintf("%d", c.Stack)
 	}

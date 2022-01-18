@@ -75,7 +75,7 @@ type DatastreamConfig struct {
 	Parameters          []*Parameters        `json:"parameters"`
 	ParametersListInt   []*ParametersListInt `json:"parameters_int"`
 	ParametersListStr   []*ParametersListStr `json:"parameters_str"`
-	Schedules           []Schedule           `json:"schedules"`
+	Schedules           *[]Schedule          `json:"schedules,omitempty"`
 }
 
 type DatastreamCommonUpdateConfig struct {
