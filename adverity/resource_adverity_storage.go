@@ -105,7 +105,7 @@ func storageUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	return connectionRead(ctx, d, m)
+	return storageRead(ctx, d, m)
 }
 
 func storageDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
