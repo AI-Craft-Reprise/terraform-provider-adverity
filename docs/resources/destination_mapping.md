@@ -24,6 +24,9 @@ description: |-
 
 ### Optional
 
+- **datastream_enabled** (Boolean)
+- **days_to_fetch** (Number)
+- **fetch_on_creation** (Boolean)
 - **id** (String) The ID of this resource.
 
 

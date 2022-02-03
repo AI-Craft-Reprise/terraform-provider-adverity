@@ -273,3 +273,8 @@ type Query struct {
 	Key   string
 	Value string
 }
+
+type FetchConfig struct {
+	StartDate string `json:"start"`
+	EndDate   string `json:"end"`
+}

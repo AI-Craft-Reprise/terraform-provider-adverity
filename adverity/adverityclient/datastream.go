@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datastream, error) {
@@ -246,5 +247,32 @@ func (client *Client) DataStreamChangeDatatype(conf DatastreamDatatypeConfig, id
 		return response, errorString{"Failed setting datatype of Datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
+	return response, nil
+}
+
+func (client *Client) ScheduleFetch(days_to_fetch int, id string) (*http.Response, error) {
+	u := *client.restURL
+	u.Path = u.Path + "datastreams/" + id + "/fetch_fixed/"
+
+	currentTime := time.Now()
+	endDate := currentTime.Format("2006-01-02")
+	startDate := currentTime.AddDate(0, 0, -days_to_fetch).Format("2006-01-02")
+
+	fetchConf := FetchConfig{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
+
+	body, _ := json.Marshal(fetchConf)
+	log.Println("[DEBUG] Sent body for echeduling fetch: " + string(body))
+	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	if !responseOK(response) {
+		defer response.Body.Close()
+		body, _ := ioutil.ReadAll(response.Body)
+		return response, errorString{"Failed doing fetch. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+	}
 	return response, nil
 }
