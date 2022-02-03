@@ -36,6 +36,21 @@ func destinationMapping() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
+			"datastream_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"fetch_on_creation": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"days_to_fetch": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  30,
+			},
 		},
 	}
 }
@@ -61,6 +76,16 @@ func destinationMappingCreate(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	d.SetId(strconv.Itoa(res.ID))
+
+	if d.Get("datastream_enabled").(bool) {
+		if d.Get("fetch_on_creation").(bool) {
+			_, err := client.ScheduleFetch(d.Get("days_to_fetch").(int), strconv.Itoa(datastream_id))
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		}
+	}
+
 	return destinationMappingRead(ctx, d, m)
 }
 

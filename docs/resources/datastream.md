@@ -29,7 +29,9 @@ description: |-
 - **datastream_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_list))
 - **datastream_parameters** (Map of String)
 - **datastream_string_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_string_list))
+- **days_to_fetch** (Number)
 - **description** (String)
+- **do_fetch_on_update** (Boolean)
 - **extract_name_keys** (String)
 - **id** (String) The ID of this resource.
 - **is_insights_mediaplan** (Boolean)

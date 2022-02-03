@@ -93,12 +93,10 @@ func datastream() *schema.Resource {
 			"stack": {
 				Type:     schema.TypeInt,
 				Required: true,
-				ForceNew: true,
 			},
 			"auth": {
 				Type:     schema.TypeInt,
 				Required: true,
-				ForceNew: true,
 			},
 			"datatype": {
 				Type:     schema.TypeString,
@@ -107,6 +105,16 @@ func datastream() *schema.Resource {
 			"enabled": {
 				Type:     schema.TypeBool,
 				Required: true,
+			},
+			"do_fetch_on_update": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"days_to_fetch": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  30,
 			},
 			"datastream_type_id": {
 				Type:     schema.TypeInt,
@@ -535,6 +543,15 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 	_, err = client.UpdateDatastreamSpecific(specific_conf, d.Id(), datastream_type_id)
 	if err != nil {
 		return diag.FromErr(err)
+	}
+
+	if enabled {
+		if d.Get("do_fetch_on_update").(bool) {
+			_, err := client.ScheduleFetch(d.Get("days_to_fetch").(int), d.Id())
+			if err != nil {
+				return diag.FromErr(err)
+			}
+		}
 	}
 
 	return datastreamRead(ctx, d, m)
