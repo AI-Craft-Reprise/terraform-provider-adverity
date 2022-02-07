@@ -22,6 +22,7 @@ description: |-
 
 ### Optional
 
+- **disable_lookup** (Boolean)
 - **id** (String) The ID of this resource.
 - **match_exact_term** (Boolean)
 - **parameters** (Block List) (see [below for nested schema](#nestedblock--parameters))
