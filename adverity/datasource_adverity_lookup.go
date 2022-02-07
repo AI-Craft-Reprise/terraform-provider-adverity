@@ -73,6 +73,11 @@ func datasourceAdverityLookup() *schema.Resource {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
+			"disable_lookup": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
 		},
 		ReadContext: dataSourceLookupRead,
 	}
@@ -80,79 +85,81 @@ func datasourceAdverityLookup() *schema.Resource {
 
 func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	parameters := d.Get("parameters").([]interface{})
-	url := d.Get("url").(string)
-	providerConfig := m.(*config)
-	client := *providerConfig.Client
-	params := []adverityclient.Query{}
-	for _, parameter := range parameters {
-		p := parameter.(map[string]interface{})
-		param := adverityclient.Query{
-			Key:   p["argument"].(string),
-			Value: p["value"].(string),
-		}
-		params = append(params, param)
-	}
-	var res *adverityclient.LookupString
-	var err error
-	if d.Get("expect_string").(bool) {
-		res, err = client.DoLookupString(url, params)
-	} else {
-		int_res, int_err := client.DoLookup(url, params)
-		err = int_err
-		id_mappings := []adverityclient.IDMappingString{}
-		for _, id_mapping_int := range int_res.Results {
-			id := strconv.Itoa(id_mapping_int.ID)
-			id_mapping := adverityclient.IDMappingString{
-				ID:   id,
-				Name: id_mapping_int.Name,
+	list := []string{}
+	if !d.Get("disable_lookup").(bool) {
+		parameters := d.Get("parameters").([]interface{})
+		url := d.Get("url").(string)
+		providerConfig := m.(*config)
+		client := *providerConfig.Client
+		params := []adverityclient.Query{}
+		for _, parameter := range parameters {
+			p := parameter.(map[string]interface{})
+			param := adverityclient.Query{
+				Key:   p["argument"].(string),
+				Value: p["value"].(string),
 			}
-			id_mappings = append(id_mappings, id_mapping)
+			params = append(params, param)
 		}
-		res = &adverityclient.LookupString{
-			Error:   int_res.Error,
-			Results: id_mappings,
-		}
-	}
-	if err != nil {
-		return diag.FromErr(err)
-	}
-	if res.Error != "nil" {
-		return diag.Errorf("Error while doing lookup: %s", res.Error)
-	}
-	idMappings := flattenLookup(&res.Results)
-	if err := d.Set("id_mappings", idMappings); err != nil {
-		return diag.FromErr(err)
-	}
-	search_terms, exists := d.GetOk("search_terms")
-	filtered_list := []string{}
-	match_exact := d.Get("match_exact_term").(bool)
-	if exists {
-		for _, term := range search_terms.([]interface{}) {
-			if term == nil {
-				return diag.Errorf("Failed doing lookup: empty string not permitted")
+		var res *adverityclient.LookupString
+		var err error
+		if d.Get("expect_string").(bool) {
+			res, err = client.DoLookupString(url, params)
+		} else {
+			int_res, int_err := client.DoLookup(url, params)
+			err = int_err
+			id_mappings := []adverityclient.IDMappingString{}
+			for _, id_mapping_int := range int_res.Results {
+				id := strconv.Itoa(id_mapping_int.ID)
+				id_mapping := adverityclient.IDMappingString{
+					ID:   id,
+					Name: id_mapping_int.Name,
+				}
+				id_mappings = append(id_mappings, id_mapping)
 			}
-			found_match := false
-			for _, mapping := range idMappings {
-				mapping_cast := mapping.(map[string]interface{})
-				id := mapping_cast["id"].(string)
-				name := mapping_cast["text"].(string)
-				if name == term.(string) || (strings.Contains(strings.ToLower(name), strings.ToLower(term.(string))) && !match_exact) {
-					filtered_list = append(filtered_list, id)
-					found_match = true
+			res = &adverityclient.LookupString{
+				Error:   int_res.Error,
+				Results: id_mappings,
+			}
+		}
+		if err != nil {
+			return diag.FromErr(err)
+		}
+		if res.Error != "nil" {
+			return diag.Errorf("Error while doing lookup: %s", res.Error)
+		}
+		idMappings := flattenLookup(&res.Results)
+		if err := d.Set("id_mappings", idMappings); err != nil {
+			return diag.FromErr(err)
+		}
+		search_terms, exists := d.GetOk("search_terms")
+		filtered_list := []string{}
+		match_exact := d.Get("match_exact_term").(bool)
+		if exists {
+			for _, term := range search_terms.([]interface{}) {
+				if term == nil {
+					return diag.Errorf("Failed doing lookup: empty string not permitted")
+				}
+				found_match := false
+				for _, mapping := range idMappings {
+					mapping_cast := mapping.(map[string]interface{})
+					id := mapping_cast["id"].(string)
+					name := mapping_cast["text"].(string)
+					if name == term.(string) || (strings.Contains(strings.ToLower(name), strings.ToLower(term.(string))) && !match_exact) {
+						filtered_list = append(filtered_list, id)
+						found_match = true
+					}
+				}
+				if !found_match {
+					return diag.Errorf("Error while doing lookup: could not find a match for term \"%s\"", term.(string))
 				}
 			}
-			if !found_match {
-				return diag.Errorf("Error while doing lookup: could not find a match for term \"%s\"", term.(string))
-			}
 		}
-	}
-	allFilters := make(map[string]bool)
-	list := []string{}
-	for _, item := range filtered_list {
-		if _, value := allFilters[item]; !value {
-			allFilters[item] = true
-			list = append(list, item)
+		allFilters := make(map[string]bool)
+		for _, item := range filtered_list {
+			if _, value := allFilters[item]; !value {
+				allFilters[item] = true
+				list = append(list, item)
+			}
 		}
 	}
 	d.Set("filtered_list", list)
