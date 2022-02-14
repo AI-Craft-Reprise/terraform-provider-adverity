@@ -2,7 +2,9 @@ package adverity
 
 import (
 	"context"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,6 +17,9 @@ func connection() *schema.Resource {
 		ReadContext:   connectionRead,
 		UpdateContext: connectionUpdate,
 		DeleteContext: connectionDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: connectionImportHelper,
+		},
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
@@ -92,8 +97,12 @@ func connectionRead(ctx context.Context, d *schema.ResourceData, m interface{}) 
 
 	client := *providerConfig.Client
 
-	res, err := client.ReadConnection(d.Id(), connectionTypeId)
+	res, err, code := client.ReadConnection(d.Id(), connectionTypeId)
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 	d.Set(NAME, res.Name)
@@ -152,4 +161,19 @@ func connectionDelete(ctx context.Context, d *schema.ResourceData, m interface{}
 	}
 
 	return diags
+}
+
+func connectionImportHelper(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), ":", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%s), expected connection_type:connection_id", d.Id())
+	}
+	connection_type_id, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return nil, fmt.Errorf("could not convert connection_type (%s) to an integer", parts[0])
+	}
+	d.Set(CONNECTION_TYPE_ID, connection_type_id)
+	d.SetId(parts[1])
+
+	return []*schema.ResourceData{d}, nil
 }

@@ -3,14 +3,15 @@ package adverityclient
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+
+	// "log"
 	"net/http"
 	"strconv"
-	//     "log"
-	"fmt"
 )
 
-func (client *Client) ReadConnection(id string, connection_type_id int) (*Connection, error) {
+func (client *Client) ReadConnection(id string, connection_type_id int) (*Connection, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/" + id + "/"
 	response, err := client.sendRequestRead(u)
@@ -19,15 +20,15 @@ func (client *Client) ReadConnection(id string, connection_type_id int) (*Connec
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading connection. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading connection. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, response.StatusCode
 	}
 
-	return resMap, nil
+	return resMap, nil, response.StatusCode
 
 }
 
