@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -16,6 +17,9 @@ func datastream() *schema.Resource {
 		ReadContext:   datastreamRead,
 		UpdateContext: datastreamUpdate,
 		DeleteContext: datastreamDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: datastreamImportHelper,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -586,4 +590,19 @@ func flattenSchedulesData(schedules *[]adverityclient.Schedule) []interface{} {
 		return schs
 	}
 	return make([]interface{}, 0)
+}
+
+func datastreamImportHelper(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), ":", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%s), expected datastream_type:datastream_id", d.Id())
+	}
+	datastream_type_id, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return nil, fmt.Errorf("could not convert datastream_type (%s) to an integer", parts[0])
+	}
+	d.Set("datastream_type_id", datastream_type_id)
+	d.SetId(parts[1])
+
+	return []*schema.ResourceData{d}, nil
 }
