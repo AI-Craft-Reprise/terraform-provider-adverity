@@ -15,6 +15,9 @@ func storage() *schema.Resource {
 		ReadContext:   storageRead,
 		UpdateContext: storageUpdate,
 		DeleteContext: storageDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: storageImportHelper,
+		},
 
 		Schema: map[string]*schema.Schema{
 			"name": {
@@ -122,4 +125,12 @@ func storageDelete(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	}
 
 	return diags
+}
+
+// Useless function, included in case format changes in the future
+func storageImportHelper(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+
+	d.SetId(d.Id())
+
+	return []*schema.ResourceData{d}, nil
 }
