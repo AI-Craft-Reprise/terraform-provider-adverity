@@ -3,6 +3,7 @@ package adverity
 import (
 	"context"
 	"strconv"
+	"strings"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -16,6 +17,9 @@ func workspace() *schema.Resource {
 		ReadContext:   workspaceRead,
 		UpdateContext: workspaceUpdate,
 		DeleteContext: workspaceDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: workspaceImportHelper,
+		},
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
@@ -69,9 +73,6 @@ func workspaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) d
 	var diags diag.Diagnostics
 
 	slug := d.Get(SLUG).(string)
-	datalakeId := d.Get(DATALAKE_ID).(string)
-	parentId := d.Get(PARENT_ID).(int)
-	name := d.Get(NAME).(string)
 
 	providerConfig := m.(*config)
 
@@ -82,9 +83,13 @@ func workspaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.FromErr(err)
 	}
 	d.SetId(strconv.Itoa(res.ID))
+
+	cutDatalake := strings.SplitN(res.Datalake, "/", -1)
+	datalakeId := cutDatalake[len(cutDatalake)-2]
+
 	d.Set(DATALAKE_ID, datalakeId)
-	d.Set(PARENT_ID, parentId)
-	d.Set(NAME, name)
+	d.Set(PARENT_ID, res.ParentID)
+	d.Set(NAME, res.Name)
 
 	return diags
 }
@@ -130,4 +135,10 @@ func workspaceDelete(ctx context.Context, d *schema.ResourceData, m interface{})
 	}
 
 	return diags
+}
+
+func workspaceImportHelper(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	d.Set(SLUG, d.Id())
+
+	return []*schema.ResourceData{d}, nil
 }
