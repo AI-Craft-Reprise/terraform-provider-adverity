@@ -2,7 +2,9 @@ package adverity
 
 import (
 	"context"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,6 +17,9 @@ func destination() *schema.Resource {
 		ReadContext:   destinationRead,
 		UpdateContext: destinationUpdate,
 		DeleteContext: destinationDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: destinationImportHelper,
+		},
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
@@ -166,4 +171,19 @@ func destinationDelete(ctx context.Context, d *schema.ResourceData, m interface{
 	}
 
 	return diags
+}
+
+func destinationImportHelper(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), ":", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%s), expected destination_type:destination_id", d.Id())
+	}
+	destination_type, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return nil, fmt.Errorf("could not convert destination_type (%s) to an integer", parts[0])
+	}
+	d.Set(DESTINATION_TYPE, destination_type)
+	d.SetId(parts[1])
+
+	return []*schema.ResourceData{d}, nil
 }

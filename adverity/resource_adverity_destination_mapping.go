@@ -2,7 +2,9 @@ package adverity
 
 import (
 	"context"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -15,6 +17,9 @@ func destinationMapping() *schema.Resource {
 		ReadContext:   destinationMappingRead,
 		UpdateContext: destinationMappingUpdate,
 		DeleteContext: destinationMappingDelete,
+		Importer: &schema.ResourceImporter{
+			StateContext: destinationMappingImportHelper,
+		},
 
 		Schema: map[string]*schema.Schema{
 			DESTINATION_TYPE: {
@@ -157,4 +162,24 @@ func destinationMappingDelete(ctx context.Context, d *schema.ResourceData, m int
 	}
 
 	return diags
+}
+
+func destinationMappingImportHelper(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	parts := strings.SplitN(d.Id(), ":", 3)
+	if len(parts) != 3 || parts[0] == "" || parts[1] == "" || parts[2] == "" {
+		return nil, fmt.Errorf("unexpected format of ID (%s), expected destination_type:destination_id:destinationmapping_id", d.Id())
+	}
+	destination_type, err := strconv.Atoi(parts[0])
+	if err != nil {
+		return nil, fmt.Errorf("could not convert destination_type (%s) to an integer", parts[0])
+	}
+	destination_id, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return nil, fmt.Errorf("could not convert destination_id (%s) to an integer", parts[1])
+	}
+	d.Set(DESTINATION_TYPE, destination_type)
+	d.Set(DESTINATION_ID, destination_id)
+	d.SetId(parts[2])
+
+	return []*schema.ResourceData{d}, nil
 }
