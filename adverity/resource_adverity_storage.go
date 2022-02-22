@@ -74,8 +74,12 @@ func storageRead(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 
 	client := *providerConfig.Client
 
-	res, err := client.ReadStorage(d.Id())
+	res, err, code := client.ReadStorage(d.Id())
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 	d.Set("name", res.Name)

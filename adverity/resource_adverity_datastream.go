@@ -373,8 +373,12 @@ func datastreamRead(ctx context.Context, d *schema.ResourceData, m interface{}) 
 
 	client := *providerConfig.Client
 
-	res, err := client.ReadDatastream(d.Id(), datastream_type_id)
+	res, err, code := client.ReadDatastream(d.Id(), datastream_type_id)
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 	schedules := flattenSchedulesData(&res.Schedules)

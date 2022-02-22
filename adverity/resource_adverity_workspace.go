@@ -78,8 +78,12 @@ func workspaceRead(ctx context.Context, d *schema.ResourceData, m interface{}) d
 
 	client := *providerConfig.Client
 
-	res, err := client.ReadWorkspace(slug)
+	res, err, code := client.ReadWorkspace(slug)
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 	d.SetId(strconv.Itoa(res.ID))

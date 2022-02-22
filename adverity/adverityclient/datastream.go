@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datastream, error) {
+func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datastream, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id + "/"
 	response, err := client.sendRequestRead(u)
@@ -20,15 +20,15 @@ func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datast
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading datastream. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, response.StatusCode
 	}
 
-	return resMap, nil
+	return resMap, nil, response.StatusCode
 
 }
 

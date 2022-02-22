@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (client *Client) ReadDestination(id string, destination_type_id int) (*Destination, error) {
+func (client *Client) ReadDestination(id string, destination_type_id int) (*Destination, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "target-types/" + strconv.Itoa(destination_type_id) + "/targets/" + id + "/"
 
@@ -18,15 +18,15 @@ func (client *Client) ReadDestination(id string, destination_type_id int) (*Dest
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading Destination. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading Destination. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, response.StatusCode
 	}
 
-	return resMap, nil
+	return resMap, nil, response.StatusCode
 
 }
 

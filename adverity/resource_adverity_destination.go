@@ -104,8 +104,12 @@ func destinationRead(ctx context.Context, d *schema.ResourceData, m interface{})
 
 	client := *providerConfig.Client
 
-	res, err := client.ReadDestination(d.Id(), destinationType)
+	res, err, code := client.ReadDestination(d.Id(), destinationType)
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 

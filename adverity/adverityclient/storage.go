@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (client *Client) ReadStorage(id string) (*Storage, error) {
+func (client *Client) ReadStorage(id string) (*Storage, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "storage/" + id + "/"
 	response, err := client.sendRequestRead(u)
@@ -18,15 +18,15 @@ func (client *Client) ReadStorage(id string) (*Storage, error) {
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading Storage. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading Storage. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, response.StatusCode
 	}
 
-	return resMap, nil
+	return resMap, nil, response.StatusCode
 
 }
 

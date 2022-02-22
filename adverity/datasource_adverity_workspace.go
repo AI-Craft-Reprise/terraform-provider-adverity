@@ -44,8 +44,12 @@ func workspaceDataSource(ctx context.Context, d *schema.ResourceData, m interfac
 
 	client := *providerConfig.Client
 
-	res, err := client.ReadWorkspace(slug)
+	res, err, code := client.ReadWorkspace(slug)
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 	d.SetId(workspace_id)
