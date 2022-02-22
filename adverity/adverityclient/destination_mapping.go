@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (client *Client) ReadDestinationMapping(id int, destination_type int, destination_id int) (*DestinationMapping, error) {
+func (client *Client) ReadDestinationMapping(id int, destination_type int, destination_id int) (*DestinationMapping, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "target-types/" + strconv.Itoa(destination_type) + "/targets/" + strconv.Itoa(destination_id) + "/mappings/" + strconv.Itoa(id) + "/"
 
@@ -18,15 +18,15 @@ func (client *Client) ReadDestinationMapping(id int, destination_type int, desti
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading Destination Mapping. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading Destination Mapping. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, response.StatusCode
 	}
 
-	return resMap, nil
+	return resMap, nil, response.StatusCode
 }
 
 func (client *Client) CreateDestinationMapping(conf DestinationMappingConfig, destination_type int, destination_id int) (*DestinationMapping, error) {

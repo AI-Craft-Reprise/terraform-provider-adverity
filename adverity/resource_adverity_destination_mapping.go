@@ -104,8 +104,12 @@ func destinationMappingRead(ctx context.Context, d *schema.ResourceData, m inter
 	}
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
-	res, err := client.ReadDestinationMapping(id, destination_type, destination_id)
+	res, err, code := client.ReadDestinationMapping(id, destination_type, destination_id)
 	if err != nil {
+		if code == 404 {
+			d.SetId("")
+			return diags
+		}
 		return diag.FromErr(err)
 	}
 

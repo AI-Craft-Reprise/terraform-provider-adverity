@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func (client *Client) ReadWorkspace(id string) (*Workspace, error) {
+func (client *Client) ReadWorkspace(id string) (*Workspace, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "stacks/" + id + "/"
 
@@ -18,15 +18,15 @@ func (client *Client) ReadWorkspace(id string) (*Workspace, error) {
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, response.StatusCode
 	}
 
-	return resMap, nil
+	return resMap, nil, response.StatusCode
 
 }
 
