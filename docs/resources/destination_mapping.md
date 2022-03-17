@@ -25,6 +25,8 @@ description: |-
 ### Optional
 
 - **datastream_enabled** (Boolean)
+- **days_to_fetch** (Number) Deprecated, use fetching_config
+- **fetch_on_creation** (Boolean) Deprecated, use fetching_config
 - **fetching_config** (Block List, Max: 1) (see [below for nested schema](#nestedblock--fetching_config))
 - **id** (String) The ID of this resource.
 

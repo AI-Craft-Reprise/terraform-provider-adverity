@@ -72,6 +72,18 @@ func destinationMapping() *schema.Resource {
 					},
 				},
 			},
+			"fetch_on_creation": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Deprecated, use fetching_config",
+			},
+			"days_to_fetch": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     30,
+				Description: "Deprecated, use fetching_config",
+			},
 		},
 	}
 }
@@ -123,6 +135,11 @@ func destinationMappingCreate(ctx context.Context, d *schema.ResourceData, m int
 				if err != nil {
 					return diag.FromErr(err)
 				}
+			}
+		} else if d.Get("do_fetch_on_update").(bool) {
+			_, err := client.FetchNumberOfDays(d.Get("days_to_fetch").(int), d.Id())
+			if err != nil {
+				return diag.FromErr(err)
 			}
 		}
 	}

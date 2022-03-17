@@ -136,6 +136,18 @@ func datastream() *schema.Resource {
 					},
 				},
 			},
+			"do_fetch_on_update": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "Deprecated, use fetching_config",
+			},
+			"days_to_fetch": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     30,
+				Description: "Deprecated, use fetching_config",
+			},
 			"datastream_type_id": {
 				Type:     schema.TypeInt,
 				Required: true,
@@ -595,17 +607,14 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 					return diag.FromErr(err)
 				}
 			}
-		}
-	}
-
-	/*if enabled {
-		if d.Get("do_fetch_on_update").(bool) {
-			_, err := client.ScheduleFetch(d.Get("days_to_fetch").(int), d.Id())
+			// Deprecated part for compatibility
+		} else if d.Get("do_fetch_on_update").(bool) {
+			_, err := client.FetchNumberOfDays(d.Get("days_to_fetch").(int), d.Id())
 			if err != nil {
 				return diag.FromErr(err)
 			}
 		}
-	}*/
+	}
 
 	return datastreamRead(ctx, d, m)
 }
