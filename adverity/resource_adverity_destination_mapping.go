@@ -9,6 +9,7 @@ import (
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func destinationMapping() *schema.Resource {
@@ -46,15 +47,30 @@ func destinationMapping() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"fetch_on_creation": {
-				Type:     schema.TypeBool,
+			"fetching_config": {
+				Type:     schema.TypeList,
 				Optional: true,
-				Default:  false,
-			},
-			"days_to_fetch": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  30,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"fetch_on_creation": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+						"days_to_fetch": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  30,
+						},
+						"mode": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      "days",
+							ValidateFunc: validation.StringInSlice([]string{"days", "previous_months", "current_month", "previous_weeks", "current_week", "custom"}, false),
+						},
+					},
+				},
 			},
 		},
 	}
@@ -83,10 +99,30 @@ func destinationMappingCreate(ctx context.Context, d *schema.ResourceData, m int
 	d.SetId(strconv.Itoa(res.ID))
 
 	if d.Get("datastream_enabled").(bool) {
-		if d.Get("fetch_on_creation").(bool) {
-			_, err := client.ScheduleFetch(d.Get("days_to_fetch").(int), strconv.Itoa(datastream_id))
-			if err != nil {
-				return diag.FromErr(err)
+		if _, hasFetchingConfig := d.GetOk("fetching_config"); hasFetchingConfig {
+			if d.Get("fetching_config.0.fetch_on_creation").(bool) {
+				number_of_days := d.Get("fetching_config.0.days_to_fetch").(int)
+				id := strconv.Itoa(datastream_id)
+				var err error
+				switch mode := d.Get("fetching_config.0.mode").(string); mode {
+				case "days":
+					_, err = client.FetchNumberOfDays(number_of_days, id)
+				case "previous_months":
+					_, err = client.FetchPreviousMonths(number_of_days, id)
+				case "current_month":
+					_, err = client.FetchCurrentMonth(id)
+				case "previous_weeks":
+					_, err = client.FetchPreviousWeeks(number_of_days, id)
+				case "current_week":
+					_, err = client.FetchCurrentWeek(id)
+				case "custom":
+					err = errorString{"Custom mode not implemented yet."}
+				default:
+					err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
+				}
+				if err != nil {
+					return diag.FromErr(err)
+				}
 			}
 		}
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func datastream() *schema.Resource {
@@ -110,15 +111,30 @@ func datastream() *schema.Resource {
 				Type:     schema.TypeBool,
 				Required: true,
 			},
-			"do_fetch_on_update": {
-				Type:     schema.TypeBool,
+			"fetching_config": {
+				Type:     schema.TypeList,
 				Optional: true,
-				Default:  false,
-			},
-			"days_to_fetch": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  30,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"fetch_on_update": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Default:  false,
+						},
+						"days_to_fetch": {
+							Type:     schema.TypeInt,
+							Optional: true,
+							Default:  30,
+						},
+						"mode": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      "days",
+							ValidateFunc: validation.StringInSlice([]string{"days", "previous_months", "current_month", "previous_weeks", "current_week", "custom"}, false),
+						},
+					},
+				},
 			},
 			"datastream_type_id": {
 				Type:     schema.TypeInt,
@@ -554,13 +570,42 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 	}
 
 	if enabled {
+		if _, hasFetchingConfig := d.GetOk("fetching_config"); hasFetchingConfig {
+			if d.Get("fetching_config.0.fetch_on_update").(bool) {
+				number_of_days := d.Get("fetching_config.0.days_to_fetch").(int)
+				id := d.Id()
+				var err error
+				switch mode := d.Get("fetching_config.0.mode").(string); mode {
+				case "days":
+					_, err = client.FetchNumberOfDays(number_of_days, id)
+				case "previous_months":
+					_, err = client.FetchPreviousMonths(number_of_days, id)
+				case "current_month":
+					_, err = client.FetchCurrentMonth(id)
+				case "previous_weeks":
+					_, err = client.FetchPreviousWeeks(number_of_days, id)
+				case "current_week":
+					_, err = client.FetchCurrentWeek(id)
+				case "custom":
+					err = errorString{"Custom mode not implemented yet."}
+				default:
+					err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
+				}
+				if err != nil {
+					return diag.FromErr(err)
+				}
+			}
+		}
+	}
+
+	/*if enabled {
 		if d.Get("do_fetch_on_update").(bool) {
 			_, err := client.ScheduleFetch(d.Get("days_to_fetch").(int), d.Id())
 			if err != nil {
 				return diag.FromErr(err)
 			}
 		}
-	}
+	}*/
 
 	return datastreamRead(ctx, d, m)
 }
