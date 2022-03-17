@@ -25,8 +25,16 @@ description: |-
 ### Optional
 
 - **datastream_enabled** (Boolean)
+- **fetching_config** (Block List, Max: 1) (see [below for nested schema](#nestedblock--fetching_config))
+- **id** (String) The ID of this resource.
+
+<a id="nestedblock--fetching_config"></a>
+### Nested Schema for `fetching_config`
+
+Optional:
+
 - **days_to_fetch** (Number)
 - **fetch_on_creation** (Boolean)
-- **id** (String) The ID of this resource.
+- **mode** (String)
 
 
