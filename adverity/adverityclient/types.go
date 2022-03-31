@@ -243,6 +243,7 @@ type DestinationMapping struct {
 type Schedule struct {
 	CronPreset      string `json:"cron_preset"`
 	TimeRangePreset int    `json:"time_range_preset"`
+	StartTime       string `json:"cron_start_of_day,omitempty"`
 }
 
 type DatastreamDatatypeConfig struct {

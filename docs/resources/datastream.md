@@ -42,6 +42,7 @@ description: |-
 - **overwrite_key_columns** (Boolean)
 - **retention_number** (Number) The amount (N) of fetches/extracts/days to retain (raw extracts are not counted). Must be an integer greater than zero.
 - **retention_type** (Number) Retention Type options: 1: Retain All, 2: Retain N fetches, 3: Retain N days, 4: Retain N extracts
+- **schedule_randomise_config** (Block List, Max: 1) (see [below for nested schema](#nestedblock--schedule_randomise_config))
 - **schedules** (Block List) (see [below for nested schema](#nestedblock--schedules))
 
 <a id="nestedblock--datastream_list"></a>
@@ -86,6 +87,16 @@ Optional:
 - **days_to_fetch** (Number)
 - **fetch_on_update** (Boolean)
 - **mode** (String)
+
+
+<a id="nestedblock--schedule_randomise_config"></a>
+### Nested Schema for `schedule_randomise_config`
+
+Optional:
+
+- **max_start** (String) The latest UTC time at which schedules must start, in the format hh:mm.
+- **min_start** (String) The minimum UTC time at which schedules can start, in the format hh:mm.
+- **randomise_start_time** (Boolean) If set to true, the start time of the day of the schedules belonging to this datastream will be set randomly on creation or update.
 
 
 <a id="nestedblock--schedules"></a>
