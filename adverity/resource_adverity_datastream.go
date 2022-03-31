@@ -3,8 +3,11 @@ package adverity
 import (
 	"context"
 	"fmt"
+	"math/rand"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -230,6 +233,35 @@ func datastream() *schema.Resource {
 					},
 				},
 			},
+			"schedule_randomise_config": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"randomise_start_time": {
+							Type:        schema.TypeBool,
+							Optional:    true,
+							Default:     false,
+							Description: "If set to true, the start time of the day of the schedules belonging to this datastream will be set randomly on creation or update.",
+						},
+						"min_start": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      "00:00",
+							Description:  "The minimum UTC time at which schedules can start, in the format hh:mm.",
+							ValidateFunc: validation.StringMatch(regexp.MustCompile("^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$"), "The expected format for start time is hh:mm"),
+						},
+						"max_start": {
+							Type:         schema.TypeString,
+							Optional:     true,
+							Default:      "23:59",
+							Description:  "The latest UTC time at which schedules must start, in the format hh:mm.",
+							ValidateFunc: validation.StringMatch(regexp.MustCompile("^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$"), "The expected format for end time is hh:mm"),
+						},
+					},
+				},
+			},
 		},
 	}
 }
@@ -250,6 +282,13 @@ func datastreamCreate(ctx context.Context, d *schema.ResourceData, m interface{}
 		sch := adverityclient.Schedule{
 			CronPreset:      s["cron_preset"].(string),
 			TimeRangePreset: s["time_range_preset"].(int),
+		}
+		if _, hasScheduleRandomiseConfig := d.GetOk("schedule_randomise_config"); hasScheduleRandomiseConfig {
+			if d.Get("schedule_randomise_config.0.randomise_start_time").(bool) {
+				minStart := d.Get("schedule_randomise_config.0.min_start").(string)
+				maxStart := d.Get("schedule_randomise_config.0.max_start").(string)
+				sch.StartTime = randTimeLimited(minStart, maxStart)
+			}
 		}
 		schs = append(schs, sch)
 	}
@@ -489,6 +528,13 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 			CronPreset:      s["cron_preset"].(string),
 			TimeRangePreset: s["time_range_preset"].(int),
 		}
+		if _, hasScheduleRandomiseConfig := d.GetOk("schedule_randomise_config"); hasScheduleRandomiseConfig {
+			if d.Get("schedule_randomise_config.0.randomise_start_time").(bool) {
+				minStart := d.Get("schedule_randomise_config.0.min_start").(string)
+				maxStart := d.Get("schedule_randomise_config.0.max_start").(string)
+				sch.StartTime = randTimeLimited(minStart, maxStart)
+			}
+		}
 		schs = append(schs, sch)
 	}
 
@@ -663,4 +709,20 @@ func datastreamImportHelper(ctx context.Context, d *schema.ResourceData, m inter
 	d.SetId(parts[1])
 
 	return []*schema.ResourceData{d}, nil
+}
+
+func randTimeLimited(startTime string, endTime string) string {
+	t1, _ := time.Parse("15:04", startTime)
+	t1u := t1.Unix()
+	t2, _ := time.Parse("15:04", endTime)
+	t2u := t2.Unix()
+	delta := t2u - t1u
+	rand.Seed(time.Now().UnixNano())
+	if delta < 0 {
+		delta = 86400 + delta
+	} else if delta == 0 {
+		return time.Unix(t1u, 0).Format("15:04:05")
+	}
+	sec := rand.Int63n(delta) + t1u
+	return time.Unix(sec, 0).Format("15:04:05")
 }
