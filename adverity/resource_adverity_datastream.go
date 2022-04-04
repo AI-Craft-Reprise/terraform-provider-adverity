@@ -712,9 +712,9 @@ func datastreamImportHelper(ctx context.Context, d *schema.ResourceData, m inter
 }
 
 func randTimeLimited(startTime string, endTime string) string {
-	t1, _ := time.Parse("15:04", startTime)
+	t1, _ := time.ParseInLocation("15:04", startTime, time.Local)
 	t1u := t1.Unix()
-	t2, _ := time.Parse("15:04", endTime)
+	t2, _ := time.ParseInLocation("15:04", endTime, time.Local)
 	t2u := t2.Unix()
 	delta := t2u - t1u
 	rand.Seed(time.Now().UnixNano())
