@@ -77,7 +77,7 @@ func (client *Client) UpdateConnection(conf ConnectionConfig, id string, connect
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return response, errorString{"Failed deleting workspace. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return response, errorString{"Failed updating connection. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
 	}
 
 	return response, nil

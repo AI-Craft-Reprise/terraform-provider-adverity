@@ -279,3 +279,24 @@ type FetchConfig struct {
 	StartDate string `json:"start"`
 	EndDate   string `json:"end"`
 }
+
+type Column struct {
+	ChangeURL                string `json:"change_url"`
+	Created                  string `json:"created"`
+	ID                       int    `json:"id"`
+	IsKeyColumn              bool   `json:"is_key_column"`
+	ConfirmedType            bool   `json:"confirmed_type"`
+	Name                     string `json:"name"`
+	DataType                 string `json:"datatype"`
+	Removed                  bool   `json:"removed"`
+	TargetColumn             string `json:"target_column"`
+	Updated                  string `json:"updated"`
+	HasSmartNamingConvention bool   `json:"has_smart_naming_convention"`
+}
+
+type ColumnResults struct {
+	Count    int      `json:"count"`
+	Next     string   `json:"next"`
+	Previous string   `json:"previous"`
+	Results  []Column `json:"results"`
+}
