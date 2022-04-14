@@ -29,11 +29,8 @@ description: |-
 - **datastream_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_list))
 - **datastream_parameters** (Map of String)
 - **datastream_string_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_string_list))
-- **days_to_fetch** (Number) Deprecated, use fetching_config
 - **description** (String)
-- **do_fetch_on_update** (Boolean) Deprecated, use fetching_config
 - **extract_name_keys** (String)
-- **fetching_config** (Block List, Max: 1) (see [below for nested schema](#nestedblock--fetching_config))
 - **id** (String) The ID of this resource.
 - **is_insights_mediaplan** (Boolean)
 - **manage_extract_names** (Boolean)
@@ -77,16 +74,6 @@ Optional:
 - **name** (String)
 - **values** (List of String)
 
-
-
-<a id="nestedblock--fetching_config"></a>
-### Nested Schema for `fetching_config`
-
-Optional:
-
-- **days_to_fetch** (Number)
-- **fetch_on_update** (Boolean)
-- **mode** (String)
 
 
 <a id="nestedblock--schedule_randomise_config"></a>

@@ -113,8 +113,8 @@ type DestinationConfig struct {
 }
 
 type DestinationMappingConfig struct {
-	Datastream int    `json:"datastream"`
-	TableName  string `json:"table_name"`
+	Datastream int    `json:"datastream,omitempty"`
+	TableName  string `json:"table_name,omitempty"`
 }
 
 type Workspace struct {
@@ -299,4 +299,37 @@ type ColumnResults struct {
 	Next     string   `json:"next"`
 	Previous string   `json:"previous"`
 	Results  []Column `json:"results"`
+}
+
+type FetchJob struct {
+	ID  int    `json:"id"`
+	URL string `json:"url"`
+}
+
+type FetchResponse struct {
+	Status  string     `json:"status"`
+	Message string     `json:"message"`
+	Start   string     `json:"start"`
+	End     string     `json:"end"`
+	Jobs    []FetchJob `json:"jobs"`
+}
+
+type Job struct {
+	ID         int     `json:"id"`
+	URL        string  `json:"url"`
+	JobStart   string  `json:"job_start"`
+	JobEnd     string  `json:"job_end"`
+	Progress   int     `json:"progress"`
+	State      int     `json:"state"`
+	StateLabel string  `json:"state_label"`
+	StateColor string  `json:"state_color"`
+	Issues     []Issue `json:"issues"`
+	Manual     bool    `json:"manual"`
+}
+
+type Issue struct {
+	Message               string `json:"message"`
+	TypeLabel             string `json:"type_label"`
+	ExtractionStageLabele string `json:"extraction_state_label"`
+	URL                   string `json:"url"`
 }

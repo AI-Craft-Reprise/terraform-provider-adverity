@@ -56,6 +56,7 @@ func Provider() *schema.Provider {
 			"adverity_datastream":          datastream(),
 			"adverity_destination_mapping": destinationMapping(),
 			"adverity_datatype_mapping":    datatypeMapping(),
+			"adverity_fetch":               fetch(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace": datasourceWorkspace(),

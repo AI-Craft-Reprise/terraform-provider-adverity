@@ -18,10 +18,35 @@ This is an experimental resource meant to be used when exporting data without us
 ### Required
 
 - **datastream_id** (String) The ID of the datastream.
+- **populating_settings** (Block List, Min: 1, Max: 1) (see [below for nested schema](#nestedblock--populating_settings))
 - **schema** (String) A JSON schema, as extracted from a BigQuery table.
 
 ### Optional
 
 - **id** (String) The ID of this resource.
+- **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+
+### Read-Only
+
+- **mapped** (Boolean)
+
+<a id="nestedblock--populating_settings"></a>
+### Nested Schema for `populating_settings`
+
+Required:
+
+- **connection_authorised** (Boolean)
+
+Optional:
+
+- **days_to_fetch** (Number)
+
+
+<a id="nestedblock--timeouts"></a>
+### Nested Schema for `timeouts`
+
+Optional:
+
+- **create** (String)
 
 

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 )
 
 func destinationMapping() *schema.Resource {
@@ -47,104 +47,42 @@ func destinationMapping() *schema.Resource {
 				Optional: true,
 				Default:  false,
 			},
-			"fetching_config": {
-				Type:     schema.TypeList,
-				Optional: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"fetch_on_creation": {
-							Type:     schema.TypeBool,
-							Optional: true,
-							Default:  false,
-						},
-						"days_to_fetch": {
-							Type:     schema.TypeInt,
-							Optional: true,
-							Default:  30,
-						},
-						"mode": {
-							Type:         schema.TypeString,
-							Optional:     true,
-							Default:      "days",
-							ValidateFunc: validation.StringInSlice([]string{"days", "previous_months", "current_month", "previous_weeks", "current_week", "custom"}, false),
-						},
-					},
-				},
-			},
-			"fetch_on_creation": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
-				Description: "Deprecated, use fetching_config",
-			},
-			"days_to_fetch": {
-				Type:        schema.TypeInt,
-				Optional:    true,
-				Default:     30,
-				Description: "Deprecated, use fetching_config",
-			},
 		},
 	}
 }
 
 func destinationMappingCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	destination_type := d.Get(DESTINATION_TYPE).(int)
-	destination_id := d.Get(DESTINATION_ID).(int)
-	datastream_id := d.Get(DATASTREAM_ID).(int)
-	table_name := d.Get(TABLE_NAME).(string)
+	var diags diag.Diagnostics
+	if !d.Get("datastream_enabled").(bool) {
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Warning,
+			Summary:  "WARNING: Destination mapping is blocked by the datastream not being enabled, so it will not be created.",
+		})
+		d.SetId(strconv.FormatInt(time.Now().UnixNano(), 10))
+	} else {
+		destination_type := d.Get(DESTINATION_TYPE).(int)
+		destination_id := d.Get(DESTINATION_ID).(int)
+		datastream_id := d.Get(DATASTREAM_ID).(int)
+		table_name := d.Get(TABLE_NAME).(string)
 
-	providerConfig := m.(*config)
-	client := *providerConfig.Client
+		providerConfig := m.(*config)
+		client := *providerConfig.Client
 
-	conf := adverityclient.DestinationMappingConfig{
-		Datastream: datastream_id,
-		TableName:  table_name,
-	}
-
-	res, err := client.CreateDestinationMapping(conf, destination_type, destination_id)
-
-	if err != nil {
-		return diag.FromErr(err)
-	}
-
-	d.SetId(strconv.Itoa(res.ID))
-
-	if d.Get("datastream_enabled").(bool) {
-		if _, hasFetchingConfig := d.GetOk("fetching_config"); hasFetchingConfig {
-			if d.Get("fetching_config.0.fetch_on_creation").(bool) {
-				number_of_days := d.Get("fetching_config.0.days_to_fetch").(int)
-				id := strconv.Itoa(datastream_id)
-				var err error
-				switch mode := d.Get("fetching_config.0.mode").(string); mode {
-				case "days":
-					_, err = client.FetchNumberOfDays(number_of_days, id)
-				case "previous_months":
-					_, err = client.FetchPreviousMonths(number_of_days, id)
-				case "current_month":
-					_, err = client.FetchCurrentMonth(id)
-				case "previous_weeks":
-					_, err = client.FetchPreviousWeeks(number_of_days, id)
-				case "current_week":
-					_, err = client.FetchCurrentWeek(id)
-				case "custom":
-					err = errorString{"Custom mode not implemented yet."}
-				default:
-					err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
-				}
-				if err != nil {
-					return diag.FromErr(err)
-				}
-			}
-		} else if d.Get("do_fetch_on_update").(bool) {
-			_, err := client.FetchNumberOfDays(d.Get("days_to_fetch").(int), d.Id())
-			if err != nil {
-				return diag.FromErr(err)
-			}
+		conf := adverityclient.DestinationMappingConfig{
+			Datastream: datastream_id,
+			TableName:  table_name,
 		}
-	}
 
-	return destinationMappingRead(ctx, d, m)
+		res, err := client.CreateDestinationMapping(conf, destination_type, destination_id)
+
+		if err != nil {
+			return diag.FromErr(err)
+		}
+
+		d.SetId(strconv.Itoa(res.ID))
+		diags = append(diags, destinationMappingRead(ctx, d, m)...)
+	}
+	return diags
 }
 
 func destinationMappingRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

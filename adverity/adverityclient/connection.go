@@ -48,7 +48,6 @@ func (client *Client) CreateConnection(conf ConnectionConfig, connection_type_id
 	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/"
 
 	body, _ := json.Marshal(&conf)
-	// 	log.Println(string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
 	resMap := &Connection{}
 	if !responseOK(response) {
