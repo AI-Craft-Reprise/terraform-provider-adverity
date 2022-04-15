@@ -45,13 +45,20 @@ func (client *Client) FetchPreviousMonths(days_to_fetch int, id string) (*FetchR
 	currentTime := time.Now()
 
 	// Take the last day of the previous month
-	endDate := LastOfMonth(currentTime.AddDate(0, -1, 0)).Format("2006-01-02")
+	endDate := LastOfMonth(currentTime.AddDate(0, -1, 0))
 	// Take the first day of the month after subtraction of the amount of days to fetch
-	startDate := FirstOfMonth(currentTime.AddDate(0, 0, -days_to_fetch)).Format("2006-01-02")
+	startDate := FirstOfMonth(currentTime.AddDate(0, 0, -days_to_fetch))
+	// If the startdate is after the enddate (if after subtraction of days we're still in the current month), use the first day of the previous month
+	if endDate.Before(startDate) {
+		startDate = FirstOfMonth(currentTime.AddDate(0, -1, 0))
+	}
+
+	startDateText := startDate.Format("2006-01-02")
+	endDateText := endDate.Format("2006-01-02")
 
 	fetchConfig := FetchConfig{
-		StartDate: startDate,
-		EndDate:   endDate,
+		StartDate: startDateText,
+		EndDate:   endDateText,
 	}
 	return client.DoFetch(fetchConfig, id)
 }
@@ -73,13 +80,20 @@ func (client *Client) FetchCurrentMonth(id string) (*FetchResponse, error) {
 func (client *Client) FetchPreviousWeeks(days_to_fetch int, id string) (*FetchResponse, error) {
 	currentTime := time.Now()
 	// End date is the sunday of the previous week
-	endDate := GetSunday(currentTime).AddDate(0, 0, -7).Format("2006-01-02")
+	endDate := GetSunday(currentTime).AddDate(0, 0, -7)
 	// Start date is the monday of the week after subtraction of the amount of days to fetch
-	startDate := GetMonday(currentTime.AddDate(0, 0, -days_to_fetch)).Format("2006-01-02")
+	startDate := GetMonday(currentTime.AddDate(0, 0, -days_to_fetch))
+	// If the startdate is after the enddate (if after subtraction of days we're still in the current week), use the first day of the previous week
+	if endDate.Before(startDate) {
+		startDate = GetMonday(currentTime.AddDate(0, 0, -7))
+	}
+
+	startDateText := startDate.Format("2006-01-02")
+	endDateText := endDate.Format("2006-01-02")
 
 	fetchConfig := FetchConfig{
-		StartDate: startDate,
-		EndDate:   endDate,
+		StartDate: startDateText,
+		EndDate:   endDateText,
 	}
 	return client.DoFetch(fetchConfig, id)
 }
