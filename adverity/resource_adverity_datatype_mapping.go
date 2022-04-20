@@ -3,6 +3,7 @@ package adverity
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -67,6 +68,18 @@ func datatypeMapping() *schema.Resource {
 			"mapped": {
 				Type:     schema.TypeBool,
 				Computed: true,
+			},
+			"error_on_missing_columns": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "If set to true, the resource will throw an error if a column in the schema is not found in Adverity or vice versa.",
+			},
+			"wait_for_columns": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "If set to true, the resource will wait until at least one column exists in the API before proceeding.",
 			},
 		},
 		CreateContext: datatypeMappingCreate,
@@ -159,6 +172,15 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 	datastreamID := d.Get("datastream_id").(string)
 	if d.Get("populating_settings.0.connection_authorised").(bool) {
 		columns, err := client.ReadColumns(datastreamID)
+		if d.Get("wait_for_columns").(bool) && len(columns) == 0 {
+			for len(columns) == 0 {
+				time.Sleep(10 * time.Second)
+				columns, err = client.ReadColumns(datastreamID)
+				if err != nil {
+					return diag.FromErr(err)
+				}
+			}
+		}
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -186,12 +208,25 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 			for _, column := range schema {
 				notFoundInSchema = append(notFoundInSchema, column.Name)
 			}
-			return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
+			if !d.Get("error_on_missing_columns").(bool) {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", ")),
+				})
+			} else {
+				return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
+			}
 		}
-		if len(notFoundInAPI) > 0 {
-			return diag.Errorf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", "))
+		if !d.Get("error_on_missing_columns").(bool) {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", ")),
+			})
+		} else {
+			if len(notFoundInAPI) > 0 {
+				return diag.Errorf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", "))
+			}
 		}
-
 		d.SetId(strconv.FormatInt(time.Now().UnixNano(), 10))
 
 		diags = append(diags, datatypeMappingRead(ctx, d, m)...)
@@ -229,6 +264,15 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 	datastreamID := d.Get("datastream_id").(string)
 	if d.Get("populating_settings.0.connection_authorised").(bool) {
 		columns, err := client.ReadColumns(datastreamID)
+		if d.Get("wait_for_columns").(bool) && len(columns) == 0 {
+			for len(columns) == 0 {
+				time.Sleep(10 * time.Second)
+				columns, err = client.ReadColumns(datastreamID)
+				if err != nil {
+					return diag.FromErr(err)
+				}
+			}
+		}
 		if err != nil {
 			return diag.FromErr(err)
 		}
@@ -256,10 +300,24 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 			for _, column := range schema {
 				notFoundInSchema = append(notFoundInSchema, column.Name)
 			}
-			return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
+			if !d.Get("error_on_missing_columns").(bool) {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", ")),
+				})
+			} else {
+				return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
+			}
 		}
-		if len(notFoundInAPI) > 0 {
-			return diag.Errorf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", "))
+		if !d.Get("error_on_missing_columns").(bool) {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Warning,
+				Summary:  fmt.Sprintf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", ")),
+			})
+		} else {
+			if len(notFoundInAPI) > 0 {
+				return diag.Errorf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", "))
+			}
 		}
 		diags = append(diags, datatypeMappingRead(ctx, d, m)...)
 		d.Set("mapped", true)

@@ -193,6 +193,7 @@ func fetchUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 				complete = d.Get("finished").(bool)
 				time.Sleep(10 * time.Second)
 			}
+			time.Sleep(10 * time.Second)
 		} else {
 			diags = append(diags, fetchRead(ctx, d, m)...)
 		}

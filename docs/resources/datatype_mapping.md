@@ -23,8 +23,10 @@ This is an experimental resource meant to be used when exporting data without us
 
 ### Optional
 
+- **error_on_missing_columns** (Boolean) If set to true, the resource will throw an error if a column in the schema is not found in Adverity or vice versa.
 - **id** (String) The ID of this resource.
 - **timeouts** (Block, Optional) (see [below for nested schema](#nestedblock--timeouts))
+- **wait_for_columns** (Boolean) If set to true, the resource will wait until at least one column exists in the API before proceeding.
 
 ### Read-Only
 
