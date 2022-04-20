@@ -217,13 +217,13 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 				return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
 			}
 		}
-		if !d.Get("error_on_missing_columns").(bool) {
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Warning,
-				Summary:  fmt.Sprintf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", ")),
-			})
-		} else {
-			if len(notFoundInAPI) > 0 {
+		if len(notFoundInAPI) > 0 {
+			if !d.Get("error_on_missing_columns").(bool) {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", ")),
+				})
+			} else {
 				return diag.Errorf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", "))
 			}
 		}
@@ -309,13 +309,13 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 				return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
 			}
 		}
-		if !d.Get("error_on_missing_columns").(bool) {
-			diags = append(diags, diag.Diagnostic{
-				Severity: diag.Warning,
-				Summary:  fmt.Sprintf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", ")),
-			})
-		} else {
-			if len(notFoundInAPI) > 0 {
+		if len(notFoundInAPI) > 0 {
+			if !d.Get("error_on_missing_columns").(bool) {
+				diags = append(diags, diag.Diagnostic{
+					Severity: diag.Warning,
+					Summary:  fmt.Sprintf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", ")),
+				})
+			} else {
 				return diag.Errorf("Found references in Adverity API which are not present in the specified schema: %s", strings.Join(notFoundInAPI, ", "))
 			}
 		}
