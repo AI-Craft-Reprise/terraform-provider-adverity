@@ -120,7 +120,7 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 		"Float":    "FLOAT",
 		"Date":     "DATE",
 		"DateTime": "DATETIME",
-		"Boolean":  "BOOL",
+		"Boolean":  "BOOLEAN",
 		"JSON":     "JSON",
 	}
 	datastreamID := d.Get("datastream_id").(string)
@@ -170,7 +170,7 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 		"FLOAT":    "Float",
 		"DATE":     "Date",
 		"DATETIME": "DateTime",
-		"BOOL":     "Boolean",
+		"BOOLEAN":  "Boolean",
 		"JSON":     "JSON",
 	}
 	schemaText := d.Get("schema").(string)
@@ -265,7 +265,7 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		"FLOAT":    "Float",
 		"DATE":     "Date",
 		"DATETIME": "DateTime",
-		"BOOL":     "Boolean",
+		"BOOLEAN":  "Boolean",
 		"JSON":     "JSON",
 	}
 	schemaText := d.Get("schema").(string)
