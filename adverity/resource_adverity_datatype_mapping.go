@@ -8,7 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
+	"github.com/fourcast/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
@@ -81,6 +83,12 @@ func datatypeMapping() *schema.Resource {
 				Default:     true,
 				Description: "If set to true, the resource will wait until at least one column exists in the API before proceeding.",
 			},
+			"replace_special_characters": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     true,
+				Description: "If set to true, special characters in Adverity will be replaced by underscores, and names beginning with a number will start with an \"n\" instead.",
+			},
 		},
 		CreateContext: datatypeMappingCreate,
 		ReadContext:   datatypeMappingRead,
@@ -121,6 +129,9 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 	columns, err := client.ReadColumns(datastreamID)
 	if err != nil {
 		return diag.FromErr(err)
+	}
+	if d.Get("replace_special_characters").(bool) {
+		columns = replaceSpecialCharacters(columns)
 	}
 	var existingSchema []SchemaElementNoMode
 	schemaText := d.Get("schema").(string)
@@ -183,6 +194,9 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 		if err != nil {
 			return diag.FromErr(err)
+		}
+		if d.Get("replace_special_characters").(bool) {
+			columns = replaceSpecialCharacters(columns)
 		}
 		notFoundInAPI := []string{}
 		for _, column := range columns {
@@ -276,6 +290,9 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		if err != nil {
 			return diag.FromErr(err)
 		}
+		if d.Get("replace_special_characters").(bool) {
+			columns = replaceSpecialCharacters(columns)
+		}
 		notFoundInAPI := []string{}
 		for _, column := range columns {
 			found := false
@@ -335,4 +352,20 @@ func datatypeMappingDelete(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 	d.SetId("")
 	return diags
+}
+
+func replaceSpecialCharacters(columns []adverityclient.Column) []adverityclient.Column {
+	replacedColumns := []adverityclient.Column{}
+	for _, column := range columns {
+		column.Name = strings.ReplaceAll(column.Name, "(", "_")
+		column.Name = strings.ReplaceAll(column.Name, ")", "_")
+		column.Name = strings.ReplaceAll(column.Name, "%", "_")
+		column.Name = strings.ReplaceAll(column.Name, "-", "_")
+		column.Name = strings.ReplaceAll(column.Name, " ", "_")
+		if unicode.IsDigit(rune(column.Name[0])) {
+			column.Name = "n" + column.Name
+		}
+		replacedColumns = append(replacedColumns, column)
+	}
+	return replacedColumns
 }
