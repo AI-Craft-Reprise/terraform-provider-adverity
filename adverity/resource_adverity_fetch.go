@@ -23,23 +23,27 @@ func fetch() *schema.Resource {
 			"datastream_id": {
 				Type:        schema.TypeString,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The ID of the datastream this fetch belongs to.",
 			},
 			"mode": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"days", "previous_months", "current_month", "previous_weeks", "current_week", "custom"}, false),
 				Description:  "The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month.",
 			},
 			"days_to_fetch": {
 				Type:        schema.TypeInt,
 				Required:    true,
+				ForceNew:    true,
 				Description: "The amount of days to go back for the fetch.",
 			},
 			"wait_until_completion": {
 				Type:        schema.TypeBool,
 				Optional:    true,
 				Default:     false,
+				ForceNew:    true,
 				Description: "If set to true, Terraform will wait until the fetch has completed before reporting this resource as created.",
 			},
 			"disable": {
@@ -201,7 +205,7 @@ func fetchUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 	} else {
 		return append(fetchRead(ctx, d, m), diag.Diagnostic{
 			Severity: diag.Warning,
-			Summary:  "WARNING: It is not possible to update a fetch job.",
+			Summary:  "WARNING: It is not possible to update a fetch job. If this happens, report this to the maintainers, since updating the fetch job should trigger a recreate.",
 		})
 	}
 	return diags
