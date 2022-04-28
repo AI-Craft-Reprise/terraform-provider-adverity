@@ -333,3 +333,44 @@ type Issue struct {
 	ExtractionStageLabele string `json:"extraction_state_label"`
 	URL                   string `json:"url"`
 }
+
+type ConnectionType struct {
+	ID           int      `json:"id"`
+	Name         string   `json:"name"`
+	Slug         string   `json:"slug"`
+	URL          string   `json:"url"`
+	Categories   []string `json:"categories"`
+	Keywords     []string `json:"keywords"`
+	IsDeprecated bool     `json:"is_deprecated"`
+	LogoURL      string   `json:"logo_url"`
+	CreateURL    string   `json:"create_url"`
+	Connections  string   `json:"connections"`
+}
+
+type ConnectionTypeResults struct {
+	Count    int              `json:"count"`
+	Next     string           `json:"next"`
+	Previous string           `json:"previous"`
+	Results  []ConnectionType `json:"results"`
+}
+
+type DatastreamType struct {
+	ID             int      `json:"id"`
+	Name           string   `json:"name"`
+	Slug           string   `json:"slug"`
+	URL            string   `json:"url"`
+	Categories     []string `json:"categories"`
+	Keywords       []string `json:"keywords"`
+	IsDeprecated   bool     `json:"is_deprecated"`
+	LogoURL        string   `json:"logo_url"`
+	CreateURL      string   `json:"create_url"`
+	Datastream     string   `json:"datastreams"`
+	ConnectioTypes []string `json:"connection_types"`
+}
+
+type DatastreamTypeResults struct {
+	Count    int              `json:"count"`
+	Next     string           `json:"next"`
+	Previous string           `json:"previous"`
+	Results  []DatastreamType `json:"results"`
+}

@@ -59,9 +59,11 @@ func Provider() *schema.Provider {
 			"adverity_fetch":               fetch(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"adverity_workspace": datasourceWorkspace(),
-			"adverity_auth_url":  datasourceAuthUrl(),
-			"adverity_lookup":    datasourceAdverityLookup(),
+			"adverity_workspace":       datasourceWorkspace(),
+			"adverity_auth_url":        datasourceAuthUrl(),
+			"adverity_lookup":          datasourceAdverityLookup(),
+			"adverity_connection_type": datasourceAdverityConnectionType(),
+			"adverity_datastream_type": datasourceAdverityDatastreamType(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
