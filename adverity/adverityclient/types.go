@@ -355,17 +355,17 @@ type ConnectionTypeResults struct {
 }
 
 type DatastreamType struct {
-	ID             int      `json:"id"`
-	Name           string   `json:"name"`
-	Slug           string   `json:"slug"`
-	URL            string   `json:"url"`
-	Categories     []string `json:"categories"`
-	Keywords       []string `json:"keywords"`
-	IsDeprecated   bool     `json:"is_deprecated"`
-	LogoURL        string   `json:"logo_url"`
-	CreateURL      string   `json:"create_url"`
-	Datastream     string   `json:"datastreams"`
-	ConnectioTypes []string `json:"connection_types"`
+	ID              int      `json:"id"`
+	Name            string   `json:"name"`
+	Slug            string   `json:"slug"`
+	URL             string   `json:"url"`
+	Categories      []string `json:"categories"`
+	Keywords        []string `json:"keywords"`
+	IsDeprecated    bool     `json:"is_deprecated"`
+	LogoURL         string   `json:"logo_url"`
+	CreateURL       string   `json:"create_url"`
+	Datastream      string   `json:"datastreams"`
+	ConnectionTypes []string `json:"connection_types"`
 }
 
 type DatastreamTypeResults struct {
@@ -373,4 +373,19 @@ type DatastreamTypeResults struct {
 	Next     string           `json:"next"`
 	Previous string           `json:"previous"`
 	Results  []DatastreamType `json:"results"`
+}
+
+type DestinationType struct {
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Slug    string `json:"slug"`
+	URL     string `json:"url"`
+	Targets string `json:"targets"`
+}
+
+type DestinationTypeResults struct {
+	Count    int               `json:"count"`
+	Next     string            `json:"next"`
+	Previous string            `json:"previous"`
+	Results  []DestinationType `json:"results"`
 }
