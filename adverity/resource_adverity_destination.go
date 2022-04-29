@@ -33,6 +33,7 @@ func destination() *schema.Resource {
 			DESTINATION_TYPE: {
 				Type:     schema.TypeInt,
 				Required: true,
+				ForceNew: true,
 			},
 			PROJECT_ID: {
 				Type:     schema.TypeString,
