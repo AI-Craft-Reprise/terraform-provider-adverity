@@ -115,3 +115,15 @@ func (client *Client) sendRequestQuery(u url.URL, queries []Query) (*http.Respon
 	}
 	return response, err
 }
+
+func (client *Client) sendRequestOptions(u url.URL) (*http.Response, error) {
+	req, err := http.NewRequest(http.MethodOptions, u.String(), nil)
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", client.token))
+	req.Header.Add("Content-Type", "application/json")
+
+	response, err := client.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return response, err
+}

@@ -389,3 +389,46 @@ type DestinationTypeResults struct {
 	Previous string            `json:"previous"`
 	Results  []DestinationType `json:"results"`
 }
+
+type ConnectionOptions struct {
+	Name        string                      `json:"name"`
+	Description string                      `json:"description"`
+	Renders     []string                    `json:"renders"`
+	Parses      []string                    `json:"parses"`
+	Actions     map[string]ConnectionAction `json:"actions"`
+}
+
+type ConnectionAction struct {
+	NoValidate ConnectionActionNoValidate `json:"no_validate"`
+	Name       ConnectionActionName       `json:"name"`
+	Stack      ConnectionActionChoice     `json:"stack"`
+	App        ConnectionActionChoice     `json:"app"`
+}
+
+type ConnectionActionNoValidate struct {
+	Type     string `json:"type"`
+	Required bool   `json:"required"`
+	ReadOnly bool   `json:"read_only"`
+	Label    string `json:"label"`
+}
+
+type ConnectionActionName struct {
+	Type      string `json:"string"`
+	Required  bool   `json:"required"`
+	ReadOnly  bool   `json:"read_only"`
+	Label     string `json:"label"`
+	MaxLength int    `json:"max_length"`
+}
+
+type ConnectionActionChoice struct {
+	Type     string             `json:"string"`
+	Required bool               `json:"required"`
+	ReadOnly bool               `json:"read_only"`
+	Label    string             `json:"label"`
+	Choices  []ValueDisplayName `json:"choices"`
+}
+
+type ValueDisplayName struct {
+	Value       int    `json:"value"`
+	DisplayName string `json:"display_name"`
+}

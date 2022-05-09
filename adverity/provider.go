@@ -65,6 +65,7 @@ func Provider() *schema.Provider {
 			"adverity_connection_type":  datasourceAdverityConnectionType(),
 			"adverity_datastream_type":  datasourceAdverityDatastreamType(),
 			"adverity_destination_type": datasourceAdverityDestinationType(),
+			"adverity_connection_app":   datasourceAdverityConnectionApp(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}
