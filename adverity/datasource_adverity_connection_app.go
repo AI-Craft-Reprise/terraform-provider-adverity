@@ -15,6 +15,10 @@ func datasourceAdverityConnectionApp() *schema.Resource {
 				Type:     schema.TypeInt,
 				Required: true,
 			},
+			"selector": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"app": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -27,9 +31,10 @@ func datasourceAdverityConnectionApp() *schema.Resource {
 func datasourceConnectionApp(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	connectionTypeID := d.Get("connection_type_id").(int)
+	selector := d.Get("selector").(string)
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
-	result, err := client.LookupConnectionApp(connectionTypeID)
+	result, err := client.LookupConnectionApp(connectionTypeID, selector)
 	if err != nil {
 		return diag.FromErr(err)
 	}
