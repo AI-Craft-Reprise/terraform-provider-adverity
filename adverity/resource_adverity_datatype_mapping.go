@@ -77,6 +77,14 @@ func datatypeMapping() *schema.Resource {
 				Default:     false,
 				Description: "If set to true, the resource will throw an error if a column in the schema is not found in Adverity or vice versa.",
 			},
+			"ignored_columns": {
+				Type: schema.TypeList,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+				Default:  []string{},
+			},
 			"wait_for_columns": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -198,7 +206,9 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 		if d.Get("replace_special_characters").(bool) {
 			columns = replaceSpecialCharacters(columns)
 		}
+		// notFoundInAPI and notFoundInSchema are switched naming wise, should be other way around
 		notFoundInAPI := []string{}
+		ignoredColumns := d.Get("ignored_columns").([]string)
 		for _, column := range columns {
 			found := false
 			for idx, targetColumn := range schema {
@@ -214,20 +224,36 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 				}
 			}
 			if !found {
-				notFoundInAPI = append(notFoundInAPI, column.Name)
+				toIgnore := false
+				for _, ignoredColumn := range ignoredColumns {
+					if column.Name == ignoredColumn {
+						toIgnore = true
+					}
+				}
+				if !toIgnore {
+					notFoundInAPI = append(notFoundInAPI, column.Name)
+				}
 			}
 		}
 		if len(schema) > 0 {
 			notFoundInSchema := []string{}
 			for _, column := range schema {
-				notFoundInSchema = append(notFoundInSchema, column.Name)
+				toIgnore := false
+				for _, ignoredColumn := range ignoredColumns {
+					if column.Name == ignoredColumn {
+						toIgnore = true
+					}
+				}
+				if !toIgnore {
+					notFoundInSchema = append(notFoundInSchema, column.Name)
+				}
 			}
-			if !d.Get("error_on_missing_columns").(bool) {
+			if !d.Get("error_on_missing_columns").(bool) && len(notFoundInSchema) > 0 {
 				diags = append(diags, diag.Diagnostic{
 					Severity: diag.Warning,
 					Summary:  fmt.Sprintf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", ")),
 				})
-			} else {
+			} else if len(notFoundInSchema) > 0 {
 				return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
 			}
 		}
