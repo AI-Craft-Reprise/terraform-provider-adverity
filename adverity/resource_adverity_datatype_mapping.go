@@ -83,7 +83,6 @@ func datatypeMapping() *schema.Resource {
 					Type: schema.TypeString,
 				},
 				Optional: true,
-				Default:  []string{},
 			},
 			"wait_for_columns": {
 				Type:        schema.TypeBool,
@@ -208,7 +207,10 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 		// notFoundInAPI and notFoundInSchema are switched naming wise, should be other way around
 		notFoundInAPI := []string{}
-		ignoredColumns := d.Get("ignored_columns").([]string)
+		ignoredColumns := []string{}
+		if _, exists := d.GetOk("ignored_columns"); exists {
+			ignoredColumns = d.Get("ignored_columns").([]string)
+		}
 		for _, column := range columns {
 			found := false
 			for idx, targetColumn := range schema {
