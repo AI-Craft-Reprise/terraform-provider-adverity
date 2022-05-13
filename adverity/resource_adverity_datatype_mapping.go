@@ -390,6 +390,7 @@ func replaceSpecialCharacters(columns []adverityclient.Column) []adverityclient.
 		column.Name = strings.ReplaceAll(column.Name, "%", "_")
 		column.Name = strings.ReplaceAll(column.Name, "-", "_")
 		column.Name = strings.ReplaceAll(column.Name, " ", "_")
+		column.Name = strings.ReplaceAll(column.Name, ".", "_")
 		if unicode.IsDigit(rune(column.Name[0])) {
 			column.Name = "n" + column.Name
 		}
