@@ -352,7 +352,14 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		if d.Get("replace_special_characters").(bool) {
 			columns = replaceSpecialCharacters(columns)
 		}
+		// notFoundInAPI and notFoundInSchema are switched naming wise, should be other way around
 		notFoundInAPI := []string{}
+		ignoredColumns := []string{}
+		if _, exists := d.GetOk("ignored_columns"); exists {
+			for _, column := range d.Get("ignored_columns").([]interface{}) {
+				ignoredColumns = append(ignoredColumns, column.(string))
+			}
+		}
 		for _, column := range columns {
 			found := false
 			for idx, targetColumn := range schema {
@@ -368,13 +375,29 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 				}
 			}
 			if !found {
-				notFoundInAPI = append(notFoundInAPI, column.Name)
+				toIgnore := false
+				for _, ignoredColumn := range ignoredColumns {
+					if column.Name == ignoredColumn {
+						toIgnore = true
+					}
+				}
+				if !toIgnore {
+					notFoundInAPI = append(notFoundInAPI, column.Name)
+				}
 			}
 		}
 		if len(schema) > 0 {
 			notFoundInSchema := []string{}
 			for _, column := range schema {
-				notFoundInSchema = append(notFoundInSchema, column.Name)
+				toIgnore := false
+				for _, ignoredColumn := range ignoredColumns {
+					if column.Name == ignoredColumn {
+						toIgnore = true
+					}
+				}
+				if !toIgnore {
+					notFoundInSchema = append(notFoundInSchema, column.Name)
+				}
 			}
 			if !d.Get("error_on_missing_columns").(bool) {
 				diags = append(diags, diag.Diagnostic{
