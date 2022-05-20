@@ -145,20 +145,47 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if err := json.Unmarshal([]byte(schemaText), &existingSchema); err != nil {
 		return diag.FromErr(err)
 	}
+	ignoredColumns := []string{}
+	if _, exists := d.GetOk("ignored_columns"); exists {
+		ignoredColumns = d.Get("ignored_columns").([]string)
+	}
 	var readSchema []SchemaElementNoMode
+	// For every column defined in the input schema
 	for _, existingColumn := range existingSchema {
+		found := false
+		// Go over every column that has been read from the Adverity API
 		for idx, column := range columns {
+			// Check if the names match
 			if existingColumn.Name == column.Name {
+				// Add the column read from the API to the read schema
 				readSchema = append(readSchema, SchemaElementNoMode{
 					Type: typeMapping[column.DataType],
 					Name: column.Name,
 				})
+				// Remove that column from the mist of columns read from the API
 				columns = append(columns[0:idx], columns[idx+1:]...)
+				found = true
 				break
 			}
 		}
+		// If the column wasn't found in the Adverity API, it may still be one of the ignored columns. If this is the case, it has to be
+		// added to the schema regardless, otherwise Terraform will (correctly) detect drift, and will try to change it. Since it is an ignored
+		// column, we don't need/want Terraform to do any changes to these columns.
+		if !found {
+			// Go over all columns in the ignored list
+			for _, ignoredColumn := range ignoredColumns {
+				// If the column defined in the input schema matches a column name in the ignored list
+				if existingColumn.Name == ignoredColumn {
+					// Add it to the read schema
+					readSchema = append(readSchema, existingColumn)
+					break
+				}
+			}
+		}
 	}
+	// For every remaining column that has been read in the API (and thus had no match in the input schema)
 	for _, column := range columns {
+		// Add it to the read schema
 		readSchema = append(readSchema, SchemaElementNoMode{
 			Type: typeMapping[column.DataType],
 			Name: column.Name,
