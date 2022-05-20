@@ -147,7 +147,9 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 	}
 	ignoredColumns := []string{}
 	if _, exists := d.GetOk("ignored_columns"); exists {
-		ignoredColumns = d.Get("ignored_columns").([]string)
+		for _, column := range d.Get("ignored_columns").([]interface{}) {
+			ignoredColumns = append(ignoredColumns, column.(string))
+		}
 	}
 	var readSchema []SchemaElementNoMode
 	// For every column defined in the input schema
@@ -236,7 +238,9 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 		notFoundInAPI := []string{}
 		ignoredColumns := []string{}
 		if _, exists := d.GetOk("ignored_columns"); exists {
-			ignoredColumns = d.Get("ignored_columns").([]string)
+			for _, column := range d.Get("ignored_columns").([]interface{}) {
+				ignoredColumns = append(ignoredColumns, column.(string))
+			}
 		}
 		for _, column := range columns {
 			found := false
