@@ -399,12 +399,12 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 					notFoundInSchema = append(notFoundInSchema, column.Name)
 				}
 			}
-			if !d.Get("error_on_missing_columns").(bool) {
+			if !d.Get("error_on_missing_columns").(bool) && len(notFoundInSchema) > 0 {
 				diags = append(diags, diag.Diagnostic{
 					Severity: diag.Warning,
 					Summary:  fmt.Sprintf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", ")),
 				})
-			} else {
+			} else if len(notFoundInSchema) > 0 {
 				return diag.Errorf("Could not find references in Adverity API for following columns specified in the schema: %s", strings.Join(notFoundInSchema, ", "))
 			}
 		}
