@@ -3,7 +3,7 @@ package adverity
 import (
 	"context"
 
-	"github.com/fourcast/adverityclient"
+	"github.com/devoteamgcloud/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -57,6 +57,7 @@ func Provider() *schema.Provider {
 			"adverity_destination_mapping": destinationMapping(),
 			"adverity_datatype_mapping":    datatypeMapping(),
 			"adverity_fetch":               fetch(),
+			"adverity_columns":             columns(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"adverity_workspace":        datasourceWorkspace(),

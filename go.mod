@@ -3,7 +3,7 @@ module terraform-provider-adverity
 go 1.16
 
 require (
-	github.com/fourcast/adverityclient v0.0.1
+	github.com/devoteamgcloud/adverityclient v1.0.0
 	github.com/google/go-cmp v0.5.6 // indirect
 	github.com/hashicorp/go-uuid v1.0.1 // indirect
 	github.com/hashicorp/go-version v1.3.0 // indirect
@@ -16,4 +16,4 @@ require (
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 )
 
-replace github.com/fourcast/adverityclient v0.0.1 => ./adverity/adverityclient
+replace github.com/devoteamgcloud/adverityclient v1.0.0 => ./adverity/adverityclient

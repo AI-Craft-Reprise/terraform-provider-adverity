@@ -10,7 +10,7 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/fourcast/adverityclient"
+	"github.com/devoteamgcloud/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/structure"
@@ -32,14 +32,14 @@ func datatypeMapping() *schema.Resource {
 				ValidateFunc: validation.StringIsJSON,
 				StateFunc: func(v interface{}) string {
 					jsonString, _ := structure.NormalizeJsonString(v)
-					var modeElements []SchemaElementMode
+					var modeElements []adverityclient.SchemaElementMode
 					err := json.Unmarshal([]byte(jsonString), &modeElements)
 					if err != nil {
 						return ""
 					}
-					var noModeElements []SchemaElementNoMode
+					var noModeElements []adverityclient.SchemaElementNoMode
 					for _, modeElement := range modeElements {
-						noModeElements = append(noModeElements, SchemaElementNoMode{
+						noModeElements = append(noModeElements, adverityclient.SchemaElementNoMode{
 							Type: modeElement.Type,
 							Name: modeElement.Name,
 						})
@@ -105,18 +105,8 @@ func datatypeMapping() *schema.Resource {
 		Timeouts: &schema.ResourceTimeout{
 			Create: schema.DefaultTimeout(20 * time.Minute),
 		},
+		DeprecationMessage: "This resource is deprecated. Please use the columns resource instead.",
 	}
-}
-
-type SchemaElementMode struct {
-	Mode string
-	Name string
-	Type string
-}
-
-type SchemaElementNoMode struct {
-	Name string
-	Type string
 }
 
 func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -140,7 +130,7 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 	if d.Get("replace_special_characters").(bool) {
 		columns = replaceSpecialCharacters(columns)
 	}
-	var existingSchema []SchemaElementNoMode
+	var existingSchema []adverityclient.SchemaElementNoMode
 	schemaText := d.Get("schema").(string)
 	if err := json.Unmarshal([]byte(schemaText), &existingSchema); err != nil {
 		return diag.FromErr(err)
@@ -151,7 +141,7 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 			ignoredColumns = append(ignoredColumns, column.(string))
 		}
 	}
-	var readSchema []SchemaElementNoMode
+	var readSchema []adverityclient.SchemaElementNoMode
 	// For every column defined in the input schema
 	for _, existingColumn := range existingSchema {
 		found := false
@@ -160,11 +150,11 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 			// Check if the names match
 			if existingColumn.Name == column.Name {
 				// Add the column read from the API to the read schema
-				readSchema = append(readSchema, SchemaElementNoMode{
+				readSchema = append(readSchema, adverityclient.SchemaElementNoMode{
 					Type: typeMapping[column.DataType],
 					Name: column.Name,
 				})
-				// Remove that column from the mist of columns read from the API
+				// Remove that column from the list of columns read from the API
 				columns = append(columns[0:idx], columns[idx+1:]...)
 				found = true
 				break
@@ -188,7 +178,7 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 	// For every remaining column that has been read in the API (and thus had no match in the input schema)
 	for _, column := range columns {
 		// Add it to the read schema
-		readSchema = append(readSchema, SchemaElementNoMode{
+		readSchema = append(readSchema, adverityclient.SchemaElementNoMode{
 			Type: typeMapping[column.DataType],
 			Name: column.Name,
 		})
@@ -210,7 +200,7 @@ func datatypeMappingCreate(ctx context.Context, d *schema.ResourceData, m interf
 		"JSON":     "JSON",
 	}
 	schemaText := d.Get("schema").(string)
-	var schema []SchemaElementNoMode
+	var schema []adverityclient.SchemaElementNoMode
 	if err := json.Unmarshal([]byte(schemaText), &schema); err != nil {
 		return diag.FromErr(err)
 	}
@@ -328,7 +318,7 @@ func datatypeMappingUpdate(ctx context.Context, d *schema.ResourceData, m interf
 		"JSON":     "JSON",
 	}
 	schemaText := d.Get("schema").(string)
-	var schema []SchemaElementNoMode
+	var schema []adverityclient.SchemaElementNoMode
 	if err := json.Unmarshal([]byte(schemaText), &schema); err != nil {
 		return diag.FromErr(err)
 	}

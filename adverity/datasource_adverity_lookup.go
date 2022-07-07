@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fourcast/adverityclient"
+	"github.com/devoteamgcloud/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )

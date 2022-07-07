@@ -140,22 +140,22 @@ func GetSunday(date time.Time) time.Time {
 	return sunday
 }
 
-func (client *Client) ReadJob(ID int) (*Job, error) {
+func (client *Client) ReadJob(ID int) (*Job, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "jobs/" + strconv.Itoa(ID) + "/"
 	response, err := client.sendRequestRead(u)
 	if err != nil {
-		return nil, err
+		return nil, err, 0
 	}
 	resMap := &Job{}
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)
-		return resMap, errorString{"Failed reading job. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}
+		return resMap, errorString{"Failed reading job. Got back statuscode: " + strconv.Itoa(response.StatusCode) + " with body: " + string(body)}, response.StatusCode
 	}
 	err = getJSON(response, resMap)
 	if err != nil {
-		return nil, err
+		return nil, err, 0
 	}
-	return resMap, nil
+	return resMap, nil, 0
 }

@@ -432,3 +432,25 @@ type ValueDisplayName struct {
 	Value       int    `json:"value"`
 	DisplayName string `json:"display_name"`
 }
+
+type SchemaElementMode struct {
+	Mode string `json:"mode"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type SchemaElementNoMode struct {
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+type ColumnConfig struct {
+	Name         string        `json:"name"`
+	Type         string        `json:"datatype"`
+	TargetColumn *TargetColumn `json:"target_column"`
+}
+
+type TargetColumn struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}

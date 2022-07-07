@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fourcast/adverityclient"
+	"github.com/devoteamgcloud/adverityclient"
 	"github.com/hashicorp/go-uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -126,7 +126,11 @@ func fetchCreate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 				time.Sleep(10 * time.Second)
 			}
 		} else {
-			diags = append(diags, fetchRead(ctx, d, m)...)
+			diagsFromRead := fetchRead(ctx, d, m)
+			if diagsFromRead.HasError() {
+				return append(diags, diagsFromRead...)
+			}
+			diags = append(diags, diagsFromRead...)
 		}
 		d.Set("is_waiting", false)
 	}
@@ -145,9 +149,14 @@ func fetchRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.
 		jobID := d.Get("job_id").(int)
 		providerConfig := m.(*config)
 		client := *providerConfig.Client
-		res, err := client.ReadJob(jobID)
+		res, err, code := client.ReadJob(jobID)
 		if err != nil {
-			return diag.FromErr(err)
+			if code == 404 {
+				d.SetId("")
+				return diags
+			} else {
+				return diag.FromErr(err)
+			}
 		}
 		d.Set("status", res.StateLabel)
 		d.Set("finished", res.JobEnd != "")
