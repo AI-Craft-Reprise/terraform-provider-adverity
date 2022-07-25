@@ -24,7 +24,7 @@ description: |-
 
 ### Optional
 
-- **datastream_enabled** (Boolean)
+- **datastream_enabled** (Boolean, Deprecated)
 - **id** (String) The ID of this resource.
 
 

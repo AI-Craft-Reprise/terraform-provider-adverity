@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/devoteamgcloud/adverityclient"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -43,9 +42,10 @@ func destinationMapping() *schema.Resource {
 				Required: true,
 			},
 			"datastream_enabled": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:       schema.TypeBool,
+				Optional:   true,
+				Default:    false,
+				Deprecated: "With the implementation of the colummns resource, there is no longer any reason to postpone the destination mapping until the datastream is enabled. This parameter will no longer have any effect.",
 			},
 		},
 	}
@@ -53,35 +53,27 @@ func destinationMapping() *schema.Resource {
 
 func destinationMappingCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
-	if !d.Get("datastream_enabled").(bool) {
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Warning,
-			Summary:  "WARNING: Destination mapping is blocked by the datastream not being enabled, so it will not be created.",
-		})
-		d.SetId(strconv.FormatInt(time.Now().UnixNano(), 10))
-	} else {
-		destination_type := d.Get(DESTINATION_TYPE).(int)
-		destination_id := d.Get(DESTINATION_ID).(int)
-		datastream_id := d.Get(DATASTREAM_ID).(int)
-		table_name := d.Get(TABLE_NAME).(string)
+	destination_type := d.Get(DESTINATION_TYPE).(int)
+	destination_id := d.Get(DESTINATION_ID).(int)
+	datastream_id := d.Get(DATASTREAM_ID).(int)
+	table_name := d.Get(TABLE_NAME).(string)
 
-		providerConfig := m.(*config)
-		client := *providerConfig.Client
+	providerConfig := m.(*config)
+	client := *providerConfig.Client
 
-		conf := adverityclient.DestinationMappingConfig{
-			Datastream: datastream_id,
-			TableName:  table_name,
-		}
-
-		res, err := client.CreateDestinationMapping(conf, destination_type, destination_id)
-
-		if err != nil {
-			return diag.FromErr(err)
-		}
-
-		d.SetId(strconv.Itoa(res.ID))
-		diags = append(diags, destinationMappingRead(ctx, d, m)...)
+	conf := adverityclient.DestinationMappingConfig{
+		Datastream: datastream_id,
+		TableName:  table_name,
 	}
+
+	res, err := client.CreateDestinationMapping(conf, destination_type, destination_id)
+
+	if err != nil {
+		return diag.FromErr(err)
+	}
+
+	d.SetId(strconv.Itoa(res.ID))
+	diags = append(diags, destinationMappingRead(ctx, d, m)...)
 	return diags
 }
 
