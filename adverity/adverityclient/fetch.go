@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"time"
+	"strings"
 )
 
 func (client *Client) DoFetch(fetchConfig FetchConfig, id string) (*FetchResponse, error) {
@@ -38,6 +39,17 @@ func (client *Client) FetchNumberOfDays(days_to_fetch int, id string) (*FetchRes
 		EndDate:   endDate,
 	}
 
+	return client.DoFetch(fetchConf, id)
+}
+
+func (client *Client) FetchOnDate(startDate string, endDate string, id string) (*FetchResponse, error) {
+	if len(strings.TrimSpace(startDate)) == 0 ||  len(strings.TrimSpace(endDate)) == 0{
+		return nil, errorString{"Given dates are empty."}
+	}
+	fetchConf := FetchConfig{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
 	return client.DoFetch(fetchConf, id)
 }
 

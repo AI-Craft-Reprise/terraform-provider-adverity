@@ -39,6 +39,20 @@ func fetch() *schema.Resource {
 				ForceNew:    true,
 				Description: "The amount of days to go back for the fetch.",
 			},
+			"start_date": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default: "",
+				ForceNew:    true,
+				Description: "The begin date in this format -> 2006-01-02. (YYYY - MM - DD)",
+			},
+			"end_date": {
+				Type: schema.TypeString,
+				Optional:    true,
+				Default: "",
+				ForceNew:    true,
+				Description: "The end date in this format -> 2006-01-02. (YYYY - MM - DD)",
+			},
 			"wait_until_completion": {
 				Type:        schema.TypeBool,
 				Optional:    true,
@@ -90,6 +104,8 @@ func fetchCreate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		mode := d.Get("mode").(string)
 		daysToFetch := d.Get("days_to_fetch").(int)
 		wait := d.Get("wait_until_completion").(bool)
+		start_date := d.Get("start_date").(string)
+		end_date := d.Get("end_date").(string)
 		providerConfig := m.(*config)
 		client := *providerConfig.Client
 		var err error
@@ -106,7 +122,7 @@ func fetchCreate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		case "current_week":
 			response, err = client.FetchCurrentWeek(datastreamID)
 		case "custom":
-			err = errorString{"Custom mode not implemented yet."}
+			response, err = client.FetchOnDate(start_date, end_date, datastreamID)
 		default:
 			err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
 		}
@@ -171,6 +187,8 @@ func fetchUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		mode := d.Get("mode").(string)
 		daysToFetch := d.Get("days_to_fetch").(int)
 		wait := d.Get("wait_until_completion").(bool)
+		start_date := d.Get("start_date").(string)
+		end_date := d.Get("end_date").(string)
 		providerConfig := m.(*config)
 		client := *providerConfig.Client
 		var err error
@@ -187,7 +205,7 @@ func fetchUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		case "current_week":
 			response, err = client.FetchCurrentWeek(datastreamID)
 		case "custom":
-			err = errorString{"Custom mode not implemented yet."}
+			response, err = client.FetchOnDate(start_date, end_date, datastreamID)
 		default:
 			err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
 		}
