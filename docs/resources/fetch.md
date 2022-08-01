@@ -18,8 +18,12 @@ Create a single data fetching job in Adverity for a particular datastream.
 ### Required
 
 - **datastream_id** (String) The ID of the datastream this fetch belongs to.
-- **days_to_fetch** (Number) The amount of days to go back for the fetch.
-- **mode** (String) The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month.
+- **mode** (String) The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month. 'Custom' will make a custom fetch based on the start and end date specified in the arguments.<br />
+<b>If "Days" mode is selected:</b><br />
+- **days_to_fetch** (Number) The amount of days to go back for the fetch.<br />
+<b>If "Custom" mode is selected:</b><br />
+- **start_date** (String) The start date in this format -> 2006-01-02. (YYYY - MM - DD)
+- **end_date** (String) The end date in this format -> 2006-01-02. (YYYY - MM - DD)
 
 ### Optional
 
