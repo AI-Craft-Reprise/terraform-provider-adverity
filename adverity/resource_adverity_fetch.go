@@ -35,7 +35,8 @@ func fetch() *schema.Resource {
 			},
 			"days_to_fetch": {
 				Type:        schema.TypeInt,
-				Required:    true,
+				Optional:    true,
+				Default: 	 0,
 				ForceNew:    true,
 				Description: "The amount of days to go back for the fetch.",
 			},
