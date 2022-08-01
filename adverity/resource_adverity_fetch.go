@@ -31,7 +31,7 @@ func fetch() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"days", "previous_months", "current_month", "previous_weeks", "current_week", "custom"}, false),
-				Description:  "The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month.",
+				Description:  "The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month. 'Custom' will make a custom fetch based on the start and end date specified in the arguments.",
 			},
 			"days_to_fetch": {
 				Type:        schema.TypeInt,
@@ -44,12 +44,12 @@ func fetch() *schema.Resource {
 				Optional:    true,
 				Default: "",
 				ForceNew:    true,
-				Description: "The begin date in this format -> 2006-01-02. (YYYY - MM - DD)",
+				Description: "The start date in this format -> 2006-01-02. (YYYY - MM - DD)",
 			},
 			"end_date": {
 				Type: schema.TypeString,
 				Optional:    true,
-				Default: "",
+				Default: 	 "",
 				ForceNew:    true,
 				Description: "The end date in this format -> 2006-01-02. (YYYY - MM - DD)",
 			},
