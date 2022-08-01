@@ -30,6 +30,9 @@ func (client *Client) DoFetch(fetchConfig FetchConfig, id string) (*FetchRespons
 }
 
 func (client *Client) FetchNumberOfDays(days_to_fetch int, id string) (*FetchResponse, error) {
+	if days_to_fetch == 0 {
+		return nil, errorString{"Days to fetch can not be null."}
+	}
 	currentTime := time.Now()
 	endDate := currentTime.Format("2006-01-02")
 	startDate := currentTime.AddDate(0, 0, -days_to_fetch).Format("2006-01-02")
