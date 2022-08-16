@@ -25,6 +25,9 @@ func (client *Client) ReadColumns(datastreamID string) ([]Column, error) {
 	columns := []Column{}
 	for {
 		response, err := client.sendRequestQuery(u, queries)
+		if err != nil {
+			return nil, err
+		}
 		resultsMap := &ColumnResults{}
 		if !responseOK(response) {
 			defer response.Body.Close()
@@ -35,9 +38,7 @@ func (client *Client) ReadColumns(datastreamID string) ([]Column, error) {
 		if err != nil {
 			return nil, err
 		}
-		for _, column := range resultsMap.Results {
-			columns = append(columns, column)
-		}
+		columns = append(columns, resultsMap.Results...)
 		if resultsMap.Next == "" {
 			break
 		} else {

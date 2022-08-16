@@ -447,7 +447,7 @@ type SchemaElementNoMode struct {
 type ColumnConfig struct {
 	Name         string        `json:"name"`
 	Type         string        `json:"datatype"`
-	TargetColumn *TargetColumn `json:"target_column"`
+	TargetColumn *TargetColumn `json:"target_column,omitempty"`
 }
 
 type TargetColumn struct {
