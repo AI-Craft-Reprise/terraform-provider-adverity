@@ -3,6 +3,7 @@ package adverity
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -85,9 +86,8 @@ func columnsCreate(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		}
 		if !toIgnore {
 			columnConfigs = append(columnConfigs, adverityclient.ColumnConfig{
-				Name:         column.Name,
-				Type:         typeMapping[column.Type],
-				TargetColumn: nil,
+				Name: column.Name,
+				Type: typeMapping[column.Type],
 			})
 		}
 	}
@@ -96,9 +96,11 @@ func columnsCreate(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.FromErr(err)
 	}
 	for _, column := range createdColumns {
-		err = client.PatchColumn(strconv.Itoa(column.ID), column.DataType)
-		if err != nil {
-			diags = append(diags, diag.FromErr(err)...)
+		if !column.ConfirmedType {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  fmt.Sprintf("After creating the columns, %s has confirmedType set to false. This should not happen and is either a bug in the API or the provider.", column.Name),
+			})
 		}
 	}
 	if diags.HasError() {
@@ -241,9 +243,8 @@ func columnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		}
 		if !toIgnore {
 			columnConfigs = append(columnConfigs, adverityclient.ColumnConfig{
-				Name:         column.Name,
-				Type:         typeMapping[column.Type],
-				TargetColumn: nil,
+				Name: column.Name,
+				Type: typeMapping[column.Type],
 			})
 		}
 	}
@@ -252,9 +253,11 @@ func columnsUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) d
 		return diag.FromErr(err)
 	}
 	for _, column := range createdColumns {
-		err = client.PatchColumn(strconv.Itoa(column.ID), column.DataType)
-		if err != nil {
-			diags = append(diags, diag.FromErr(err)...)
+		if !column.ConfirmedType {
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  fmt.Sprintf("After updating the columns, %s has confirmedType set to false. This should not happen and is either a bug in the API or the provider.", column.Name),
+			})
 		}
 	}
 	if diags.HasError() {
