@@ -31,13 +31,28 @@ func fetch() *schema.Resource {
 				Required:     true,
 				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"days", "previous_months", "current_month", "previous_weeks", "current_week", "custom"}, false),
-				Description:  "The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month.",
+				Description:  "The mode of the fetching jobs specifies what time windows should be used. 'Days' will fetch all data from the amount of days specified until now. The 'current' options will fetch from the beginning of the current month/week. The 'previous' options will put the start date at the beginning of the week/month a specified number of days ago, and the enddate at the end of the previous week/month. 'Custom' will make a custom fetch based on the start and end date specified in the arguments.",
 			},
 			"days_to_fetch": {
 				Type:        schema.TypeInt,
-				Required:    true,
+				Optional:    true,
+				Default: 	 0,
 				ForceNew:    true,
 				Description: "The amount of days to go back for the fetch.",
+			},
+			"start_date": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default: "",
+				ForceNew:    true,
+				Description: "The start date in this format -> 2006-01-02. (YYYY - MM - DD)",
+			},
+			"end_date": {
+				Type: schema.TypeString,
+				Optional:    true,
+				Default: 	 "",
+				ForceNew:    true,
+				Description: "The end date in this format -> 2006-01-02. (YYYY - MM - DD)",
 			},
 			"wait_until_completion": {
 				Type:        schema.TypeBool,
@@ -90,6 +105,8 @@ func fetchCreate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		mode := d.Get("mode").(string)
 		daysToFetch := d.Get("days_to_fetch").(int)
 		wait := d.Get("wait_until_completion").(bool)
+		start_date := d.Get("start_date").(string)
+		end_date := d.Get("end_date").(string)
 		providerConfig := m.(*config)
 		client := *providerConfig.Client
 		var err error
@@ -106,7 +123,7 @@ func fetchCreate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		case "current_week":
 			response, err = client.FetchCurrentWeek(datastreamID)
 		case "custom":
-			err = errorString{"Custom mode not implemented yet."}
+			response, err = client.FetchOnDate(start_date, end_date, datastreamID)
 		default:
 			err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
 		}
@@ -171,6 +188,8 @@ func fetchUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		mode := d.Get("mode").(string)
 		daysToFetch := d.Get("days_to_fetch").(int)
 		wait := d.Get("wait_until_completion").(bool)
+		start_date := d.Get("start_date").(string)
+		end_date := d.Get("end_date").(string)
 		providerConfig := m.(*config)
 		client := *providerConfig.Client
 		var err error
@@ -187,7 +206,7 @@ func fetchUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 		case "current_week":
 			response, err = client.FetchCurrentWeek(datastreamID)
 		case "custom":
-			err = errorString{"Custom mode not implemented yet."}
+			response, err = client.FetchOnDate(start_date, end_date, datastreamID)
 		default:
 			err = errorString{fmt.Sprintf("%q is not implemented, should have been caught by schema validation.", mode)}
 		}

@@ -7,6 +7,7 @@ import (
 	"log"
 	"strconv"
 	"time"
+	"strings"
 )
 
 func (client *Client) DoFetch(fetchConfig FetchConfig, id string) (*FetchResponse, error) {
@@ -29,6 +30,9 @@ func (client *Client) DoFetch(fetchConfig FetchConfig, id string) (*FetchRespons
 }
 
 func (client *Client) FetchNumberOfDays(days_to_fetch int, id string) (*FetchResponse, error) {
+	if days_to_fetch < 0 {
+		return nil, errorString{"Days to fetch cannot be negative."}
+	}
 	currentTime := time.Now()
 	endDate := currentTime.Format("2006-01-02")
 	startDate := currentTime.AddDate(0, 0, -days_to_fetch).Format("2006-01-02")
@@ -38,6 +42,17 @@ func (client *Client) FetchNumberOfDays(days_to_fetch int, id string) (*FetchRes
 		EndDate:   endDate,
 	}
 
+	return client.DoFetch(fetchConf, id)
+}
+
+func (client *Client) FetchOnDate(startDate string, endDate string, id string) (*FetchResponse, error) {
+	if len(strings.TrimSpace(startDate)) == 0 ||  len(strings.TrimSpace(endDate)) == 0{
+		return nil, errorString{"Given dates are empty."}
+	}
+	fetchConf := FetchConfig{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
 	return client.DoFetch(fetchConf, id)
 }
 
