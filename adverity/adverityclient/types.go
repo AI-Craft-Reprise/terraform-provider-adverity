@@ -281,17 +281,17 @@ type FetchConfig struct {
 }
 
 type Column struct {
-	ChangeURL                string `json:"change_url"`
-	Created                  string `json:"created"`
-	ID                       int    `json:"id"`
-	IsKeyColumn              bool   `json:"is_key_column"`
-	ConfirmedType            bool   `json:"confirmed_type"`
-	Name                     string `json:"name"`
-	DataType                 string `json:"datatype"`
-	Removed                  bool   `json:"removed"`
-	TargetColumn             string `json:"target_column"`
-	Updated                  string `json:"updated"`
-	HasSmartNamingConvention bool   `json:"has_smart_naming_convention"`
+	ChangeURL                string        `json:"change_url"`
+	Created                  string        `json:"created"`
+	ID                       int           `json:"id"`
+	IsKeyColumn              bool          `json:"is_key_column"`
+	ConfirmedType            bool          `json:"confirmed_type"`
+	Name                     string        `json:"name"`
+	DataType                 string        `json:"datatype"`
+	Removed                  bool          `json:"removed"`
+	TargetColumn             *TargetColumn `json:"target_column"`
+	Updated                  string        `json:"updated"`
+	HasSmartNamingConvention bool          `json:"has_smart_naming_convention"`
 }
 
 type ColumnResults struct {
@@ -440,8 +440,9 @@ type SchemaElementMode struct {
 }
 
 type SchemaElementNoMode struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Mapped bool   `json:"mapped,omitempty"`
 }
 
 type ColumnConfig struct {
@@ -451,6 +452,9 @@ type ColumnConfig struct {
 }
 
 type TargetColumn struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+	Usage    string `json:"usage"`
+	Datatype string `json:"datatype"`
+	Measure  string `json:"measure"`
 }

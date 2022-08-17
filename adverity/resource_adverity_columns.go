@@ -149,9 +149,11 @@ func columnsRead(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 			// Check if the names match
 			if definedColumn.Name == column.Name {
 				// Add the column read from the API to the read schema
+				// If the column  has been schema mapped (has a target column), add mapped = true
 				APISchema = append(APISchema, adverityclient.SchemaElementNoMode{
-					Type: typeMapping[column.DataType],
-					Name: column.Name,
+					Type:   typeMapping[column.DataType],
+					Name:   column.Name,
+					Mapped: column.TargetColumn != nil,
 				})
 				// Remove that column from the list of columns read from the API
 				columns = append(columns[0:idx], columns[idx+1:]...)
@@ -177,9 +179,11 @@ func columnsRead(ctx context.Context, d *schema.ResourceData, m interface{}) dia
 	// For every remaining column that has been read in the API (and thus had no match in the input schema)
 	for _, column := range columns {
 		// Add it to the read schema
+		// If the column  has been schema mapped (has a target column), add mapped = true
 		APISchema = append(APISchema, adverityclient.SchemaElementNoMode{
-			Type: typeMapping[column.DataType],
-			Name: column.Name,
+			Type:   typeMapping[column.DataType],
+			Name:   column.Name,
+			Mapped: column.TargetColumn != nil,
 		})
 	}
 	bytes, _ := json.Marshal(APISchema)
