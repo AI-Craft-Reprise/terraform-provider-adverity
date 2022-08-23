@@ -13,6 +13,9 @@ func (client *Client) ReadDestinationMapping(id int, destination_type int, desti
 	u.Path = u.Path + "target-types/" + strconv.Itoa(destination_type) + "/targets/" + strconv.Itoa(destination_id) + "/mappings/" + strconv.Itoa(id) + "/"
 
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err, 0
+	}
 
 	resMap := &DestinationMapping{}
 	if !responseOK(response) {
@@ -35,6 +38,9 @@ func (client *Client) CreateDestinationMapping(conf DestinationMappingConfig, de
 
 	body, _ := json.Marshal(conf)
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
 	resMap := &DestinationMapping{}
 	if !responseOK(response) {
 		defer response.Body.Close()
@@ -56,10 +62,10 @@ func (client *Client) UpdateDestinationMapping(conf DestinationMappingConfig, de
 
 	body, _ := json.Marshal(conf)
 	response, err := client.sendRequestUpdate(u, bytes.NewReader(body))
-	resMap := &DestinationMapping{}
 	if err != nil {
 		return nil, err
 	}
+	resMap := &DestinationMapping{}
 	if !responseOK(response) {
 		defer response.Body.Close()
 		body, _ := ioutil.ReadAll(response.Body)

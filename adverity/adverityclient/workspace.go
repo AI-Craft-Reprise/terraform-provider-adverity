@@ -13,6 +13,9 @@ func (client *Client) ReadWorkspace(id string) (*Workspace, error, int) {
 	u.Path = u.Path + "stacks/" + id + "/"
 
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err, 0
+	}
 
 	resMap := &Workspace{}
 	if !responseOK(response) {
@@ -36,6 +39,9 @@ func (client *Client) CreateWorkspace(conf CreateWorkspaceConfig) (*Workspace, e
 
 	body, _ := json.Marshal(conf)
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
 	resMap := &Workspace{}
 	if !responseOK(response) {
 		defer response.Body.Close()

@@ -15,6 +15,9 @@ func (client *Client) ReadConnection(id string, connection_type_id int) (*Connec
 	u := *client.restURL
 	u.Path = u.Path + "connection-types/" + strconv.Itoa(connection_type_id) + "/connections/" + id + "/"
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err, 0
+	}
 
 	resMap := &Connection{}
 	if !responseOK(response) {
@@ -49,6 +52,9 @@ func (client *Client) CreateConnection(conf ConnectionConfig, connection_type_id
 
 	body, _ := json.Marshal(&conf)
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
 	resMap := &Connection{}
 	if !responseOK(response) {
 		defer response.Body.Close()

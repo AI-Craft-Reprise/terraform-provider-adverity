@@ -10,6 +10,9 @@ func (client *Client) ReadAuthUrl(connectionTypeId string, connectionId string) 
 	u.Path = u.Path + "connection-types/" + connectionTypeId + "/connections/" + connectionId + "/authorize/"
 
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err
+	}
 
 	resMap := &AuthUrl{}
 	if !responseOK(response) {

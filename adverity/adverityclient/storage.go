@@ -13,6 +13,9 @@ func (client *Client) ReadStorage(id string) (*Storage, error, int) {
 	u := *client.restURL
 	u.Path = u.Path + "storage/" + id + "/"
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err, 0
+	}
 
 	resMap := &Storage{}
 	if !responseOK(response) {
@@ -37,6 +40,9 @@ func (client *Client) CreateStorage(conf StorageConfig) (*Storage, error) {
 
 	log.Println(string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
 	resMap := &Storage{}
 	if !responseOK(response) {
 		defer response.Body.Close()

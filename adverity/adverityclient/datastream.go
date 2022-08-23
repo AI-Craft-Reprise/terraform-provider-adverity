@@ -14,6 +14,9 @@ func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datast
 	u := *client.restURL
 	u.Path = u.Path + "datastream-types/" + strconv.Itoa(datastream_type_id) + "/datastreams/" + id + "/"
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err, 0
+	}
 
 	resMap := &Datastream{}
 	if !responseOK(response) {
@@ -127,6 +130,9 @@ func (client *Client) CreateDatastream(conf DatastreamConfig, datastream_type_id
 	body, _ := json.Marshal(&conf)
 	log.Println("[DEBUG] Sending body for create: " + string(body))
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
 	resMap := &Datastream{}
 	if !responseOK(response) {
 		defer response.Body.Close()

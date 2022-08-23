@@ -13,6 +13,9 @@ func (client *Client) ReadDestination(id string, destination_type_id int) (*Dest
 	u.Path = u.Path + "target-types/" + strconv.Itoa(destination_type_id) + "/targets/" + id + "/"
 
 	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return nil, err, 0
+	}
 
 	resMap := &Destination{}
 	if !responseOK(response) {
@@ -36,6 +39,9 @@ func (client *Client) CreateDestination(conf DestinationConfig, destination_type
 
 	body, _ := json.Marshal(conf)
 	response, err := client.sendRequestCreate(u, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
 	resMap := &Destination{}
 	if !responseOK(response) {
 		defer response.Body.Close()
