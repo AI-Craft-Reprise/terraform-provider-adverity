@@ -80,6 +80,7 @@ type DatastreamConfig struct {
 
 type DatastreamCommonUpdateConfig struct {
 	Name                *string    `json:"name,omitempty"`
+	Auth                *int       `json:"auth,omitempty"`
 	Description         *string    `json:"description,omitempty"`
 	RetentionType       *int       `json:"retention_type,omitempty"`
 	RetentionNumber     *int       `json:"retention_number,omitempty"`

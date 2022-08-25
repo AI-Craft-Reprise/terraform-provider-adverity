@@ -446,6 +446,10 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 		nm := name.(string)
 		common_conf.Name = &nm
 	}
+	if auth, exists := d.GetOkExists("auth"); exists {
+		au := auth.(int)
+		common_conf.Auth = &au
+	}
 	if description, exists := d.GetOkExists("description"); exists {
 		desc := description.(string)
 		common_conf.Description = &desc
@@ -465,7 +469,6 @@ func datastreamUpdate(ctx context.Context, d *schema.ResourceData, m interface{}
 	if overwrite_datastream, exists := d.GetOkExists("overwrite_datastream"); exists {
 		over_dtstrm := overwrite_datastream.(bool)
 		common_conf.OverwriteDatastream = &over_dtstrm
-	} else {
 	}
 	if overwrite_filename, exists := d.GetOkExists("overwrite_filename"); exists {
 		over_filnm := overwrite_filename.(bool)
