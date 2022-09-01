@@ -34,6 +34,19 @@ func (client *Client) ReadDatastream(id string, datastream_type_id int) (*Datast
 
 }
 
+func (client *Client) DatastreamExists(id string) (bool, error) {
+	u := *client.restURL
+	u.Path = u.Path + "datastreams/" + id + "/"
+	response, err := client.sendRequestRead(u)
+	if err != nil {
+		return false, err
+	}
+	if response.StatusCode == 404 {
+		return false, nil
+	}
+	return true, nil
+}
+
 func (c *DatastreamConfig) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
 		"name": c.Name,

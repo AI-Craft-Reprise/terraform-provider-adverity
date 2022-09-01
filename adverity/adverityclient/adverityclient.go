@@ -35,10 +35,7 @@ func CreateClientFromLogin(instanceURL, token string) (*Client, error) {
 }
 
 func responseOK(response *http.Response) bool {
-	if response.StatusCode >= 200 && response.StatusCode < 300 {
-		return true
-	}
-	return false
+	return response.StatusCode >= 200 && response.StatusCode < 300
 }
 
 func getJSON(r *http.Response, target interface{}) error {

@@ -123,6 +123,12 @@ func datatypeMappingRead(ctx context.Context, d *schema.ResourceData, m interfac
 	datastreamID := d.Get("datastream_id").(string)
 	providerConfig := m.(*config)
 	client := *providerConfig.Client
+	// Check if datastream still exists. Someone might have deleted it manually, which causes the columns to also disappear
+	exists, err := client.DatastreamExists(datastreamID)
+	if !exists {
+		d.SetId("")
+		return diags
+	}
 	columns, err := client.ReadColumns(datastreamID)
 	if err != nil {
 		return diag.FromErr(err)
