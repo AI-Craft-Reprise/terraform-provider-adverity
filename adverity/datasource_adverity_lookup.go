@@ -2,6 +2,7 @@ package adverity
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -122,14 +123,25 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 			}
 		}
 		if err != nil {
-			return diag.FromErr(err)
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  err.Error(),
+			})
+			return diags
 		}
 		if res.Error != "nil" {
-			return diag.Errorf("Error while doing lookup: %s", res.Error)
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  fmt.Sprintf("Error while doing lookup: %s", res.Error),
+			})
 		}
 		idMappings := flattenLookup(&res.Results)
 		if err := d.Set("id_mappings", idMappings); err != nil {
-			return diag.FromErr(err)
+			diags = append(diags, diag.Diagnostic{
+				Severity: diag.Error,
+				Summary:  err.Error(),
+			})
+			return diags
 		}
 		search_terms, exists := d.GetOk("search_terms")
 		filtered_list := []string{}
@@ -137,7 +149,12 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 		if exists {
 			for _, term := range search_terms.([]interface{}) {
 				if term == nil {
-					return diag.Errorf("Failed doing lookup: empty string not permitted")
+					diags = append(diags, diag.Diagnostic{
+						Severity: diag.Error,
+						Summary:  "Failed doing lookup: empty string not permitted",
+						Detail:   "In and Adverity looku an empty string (\"\") is not permitted. If you don't want to specify any search terms, leave the list empty.",
+					})
+					return diags
 				}
 				found_match := false
 				for _, mapping := range idMappings {
@@ -150,8 +167,16 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 					}
 				}
 				if !found_match {
-					return diag.Errorf("Error while doing lookup: could not find a match for term \"%s\"", term.(string))
+					diags = append(diags, diag.Diagnostic{
+						Severity: diag.Error,
+						Summary:  fmt.Sprintf("Error while doing lookup: could not find a match for term \"%s\"", term.(string)),
+						Detail:   fmt.Sprintf("No matches where found in the Adverity API for your search term \"%s\". If this is the first time running with this search term, double check that the term you have given is correct. If it used to work with this same search term, chances are that the search term no longer exists, or has been renamed in your platform. In this case, remove the term or replace it with its new equivalent.", term.(string)),
+					})
+					return diags
 				}
+			}
+			if diags.HasError() {
+				return diags
 			}
 		}
 		allFilters := make(map[string]bool)
