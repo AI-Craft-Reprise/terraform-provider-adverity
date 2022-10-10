@@ -152,7 +152,7 @@ func dataSourceLookupRead(ctx context.Context, d *schema.ResourceData, m interfa
 					diags = append(diags, diag.Diagnostic{
 						Severity: diag.Error,
 						Summary:  "Failed doing lookup: empty string not permitted",
-						Detail:   "In and Adverity looku an empty string (\"\") is not permitted. If you don't want to specify any search terms, leave the list empty.",
+						Detail:   "In an Adverity lookup an empty string (\"\") is not permitted. If you don't want to specify any search terms, leave the list empty.",
 					})
 					return diags
 				}
