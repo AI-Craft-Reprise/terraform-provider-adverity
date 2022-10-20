@@ -28,3 +28,9 @@ This resource maps a datasytream to a destination, amking sure that the data fro
 - **id** (String) The ID of this resource.
 
 
+## Import
+
+Destination mappings can be imported using the following format:
+```shell
+terraform import adverity_destination_mapping.default {destination_type}:{destination_id}:{destinationmapping_id}
+```

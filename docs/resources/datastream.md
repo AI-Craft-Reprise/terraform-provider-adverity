@@ -95,3 +95,9 @@ Required:
 - **time_range_preset** (Number) A number corresponding to the time range for which the schedule shoudl fetch data.
 
 
+## Import
+
+Datastreams can be imported using the following format:
+```shell
+terraform import adverity_datastream.default {datastream_type}:{datastream_id}
+```

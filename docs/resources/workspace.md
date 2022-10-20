@@ -30,3 +30,9 @@ Theis resource will create a new workspace.
 - **slug** (String) The slug of this workspace.
 
 
+## Import
+
+Workspaces can be imported using the following format:
+```shell
+terraform import adverity_workspace.default {workspace_id}
+```

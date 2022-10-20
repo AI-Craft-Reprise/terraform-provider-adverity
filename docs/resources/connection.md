@@ -30,4 +30,11 @@ This resource will create a connection (a.k.a. authorization) of the given type 
 
 - **is_authorized** (Boolean) Whether the connection has been authorised.
 
+## Import
+
+Connections can be imported using the following format:
+```shell
+terraform import adverity_connection.default {connection_type}:{connection_id}
+```
+
 

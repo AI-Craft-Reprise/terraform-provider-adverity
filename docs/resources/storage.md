@@ -27,3 +27,9 @@ A resource creating a storage needed for creating new workspaces.
 - **stack** (Number) The workspace ID this storage should be made in.
 
 
+## Import
+
+Storages can be imported using the following format:
+```shell
+terraform import adverity_storage.default {storage_id}
+```

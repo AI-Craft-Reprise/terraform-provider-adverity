@@ -31,3 +31,9 @@ This resource will create a destination. Currently only supports BigQuery destin
 - **id** (String) The ID of this resource.
 
 
+## Import
+
+Destinations can be imported using the following format:
+```shell
+terraform import adverity_destination.default {destination_type}:{destination_id}
+```
