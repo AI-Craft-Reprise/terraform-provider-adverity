@@ -3,12 +3,12 @@
 page_title: "adverity_storage Resource - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  A resource creating a storage needed for creating new workspaces.
 ---
 
 # adverity_storage (Resource)
 
-
+A resource creating a storage needed for creating new workspaces.
 
 
 
@@ -17,13 +17,13 @@ description: |-
 
 ### Required
 
-- **auth** (Number)
-- **name** (String)
-- **url** (String)
+- **auth** (Number) The ID of the connection that authorises this storage.
+- **name** (String) The name of the storage.
+- **url** (String) The url of the externl storage location.
 
 ### Optional
 
 - **id** (String) The ID of this resource.
-- **stack** (Number)
+- **stack** (Number) The workspace ID this storage should be made in.
 
 

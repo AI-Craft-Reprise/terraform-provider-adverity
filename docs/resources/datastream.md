@@ -3,12 +3,12 @@
 page_title: "adverity_datastream Resource - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  This resource will create a datastream of the given type in the given workspace.
 ---
 
 # adverity_datastream (Resource)
 
-
+This resource will create a datastream of the given type in the given workspace.
 
 
 
@@ -17,30 +17,30 @@ description: |-
 
 ### Required
 
-- **auth** (Number)
-- **datastream_type_id** (Number)
-- **datatype** (String)
-- **enabled** (Boolean)
-- **name** (String)
-- **stack** (Number)
+- **auth** (Number) The ID of the connection/authorization this datastream uses.
+- **datastream_type_id** (Number) The ID of the type of datastream.
+- **datatype** (String) Either 'Live' or 'Staging'.
+- **enabled** (Boolean) Whether the datastream should be enabled or not.
+- **name** (String) The name of the datastream.
+- **stack** (Number) The ID of the workspace thsi datastream belongs to.
 
 ### Optional
 
-- **datastream_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_list))
-- **datastream_parameters** (Map of String)
-- **datastream_string_list** (Block Set) (see [below for nested schema](#nestedblock--datastream_string_list))
-- **description** (String)
-- **extract_name_keys** (String)
+- **datastream_list** (Block Set) A map of parameters that are specific for this datstream type. Values should be lists of numbers. (see [below for nested schema](#nestedblock--datastream_list))
+- **datastream_parameters** (Map of String) A map of parameters that are specific for this datstream type. Values should be single values.
+- **datastream_string_list** (Block Set) A map of parameters that are specific for this datstream type. Values should be lists of strings. (see [below for nested schema](#nestedblock--datastream_string_list))
+- **description** (String) The description of the datastream. Must be under 1000 characters.
+- **extract_name_keys** (String) The name of the date column for splitting extracts.
 - **id** (String) The ID of this resource.
-- **is_insights_mediaplan** (Boolean)
-- **manage_extract_names** (Boolean)
-- **overwrite_datastream** (Boolean)
-- **overwrite_filename** (Boolean)
-- **overwrite_key_columns** (Boolean)
+- **is_insights_mediaplan** (Boolean) If true, generated extracts will be treated as Insights mediaplans.
+- **manage_extract_names** (Boolean) Split by selected date column and name extracts with pre-defined pattern to consolidate data.
+- **overwrite_datastream** (Boolean) Delete/Drop all existing rows (created by this datastream) in the destination before inserting a new import.
+- **overwrite_filename** (Boolean) Overwrite rows from same extract file.
+- **overwrite_key_columns** (Boolean) Overwrite rows according to Key defined in Schema Mapping.
 - **retention_number** (Number) The amount (N) of fetches/extracts/days to retain (raw extracts are not counted). Must be an integer greater than zero.
 - **retention_type** (Number) Retention Type options: 1: Retain All, 2: Retain N fetches, 3: Retain N days, 4: Retain N extracts
-- **schedule_randomise_config** (Block List, Max: 1) (see [below for nested schema](#nestedblock--schedule_randomise_config))
-- **schedules** (Block List) (see [below for nested schema](#nestedblock--schedules))
+- **schedule_randomise_config** (Block List, Max: 1) A configuration to randomise the time of day for when fetches should be scheduled. (see [below for nested schema](#nestedblock--schedule_randomise_config))
+- **schedules** (Block List) A list of schedules for when fetches for the datastream shoudl be scheduled. (see [below for nested schema](#nestedblock--schedules))
 
 <a id="nestedblock--datastream_list"></a>
 ### Nested Schema for `datastream_list`
@@ -54,8 +54,8 @@ Optional:
 
 Optional:
 
-- **name** (String)
-- **values** (List of Number)
+- **name** (String) The key/name of the parameter.
+- **values** (List of Number) A list with integer values for the parameter.
 
 
 
@@ -71,8 +71,8 @@ Optional:
 
 Optional:
 
-- **name** (String)
-- **values** (List of String)
+- **name** (String) The key/name of the parameter.
+- **values** (List of String) A list with string values for the parameter.
 
 
 
@@ -91,7 +91,7 @@ Optional:
 
 Required:
 
-- **cron_preset** (String)
-- **time_range_preset** (Number)
+- **cron_preset** (String) A string indicating how often the datastream should be scheduled.
+- **time_range_preset** (Number) A number corresponding to the time range for which the schedule shoudl fetch data.
 
 

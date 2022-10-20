@@ -23,39 +23,48 @@ func destination() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the destination.",
 			},
 			STACK: {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The Id of the workspace this destination belongs to.",
 			},
 			DESTINATION_TYPE: {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The type ID of the destination.",
 			},
 			PROJECT_ID: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The GCP project ID.",
 			},
 			DATASET_ID: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The ID of the BigQuery dataset.",
 			},
 			AUTH: {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The ID of the connection that authorises the destination.",
 			},
 			SCHEMA_MAPPING: {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "If set to false, schema mapping will be turned off for this destination.",
 			},
 			HEADERS_FORMATTING: {
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "A number corresponding to a style of header formatting.",
 			},
 		},
+		Description: "This resource will create a destination. Currently only supports BigQuery destinations.",
 	}
 }
 

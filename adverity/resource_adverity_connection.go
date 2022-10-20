@@ -23,16 +23,19 @@ func connection() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the connection.",
 			},
 			STACK: {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The ID of the workspace to create this connection in.",
 			},
 			CONNECTION_TYPE_ID: {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The type ID of the connection.",
 			},
 			CONNECTION_PARAMETERS: {
 				Type:     schema.TypeMap,
@@ -40,12 +43,15 @@ func connection() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "A map of extra parameters needed for connection creation. For example 'app' or 'service_account_data'.",
 			},
 			IS_AUTHORIZED: {
-				Type:     schema.TypeBool,
-				Computed: true,
+				Type:        schema.TypeBool,
+				Computed:    true,
+				Description: "Whether the connection has been authorised.",
 			},
 		},
+		Description: "This resource will create a connection (a.k.a. authorization) of the given type in the given workspace.",
 	}
 }
 

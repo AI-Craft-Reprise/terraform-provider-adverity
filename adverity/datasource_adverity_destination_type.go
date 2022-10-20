@@ -14,19 +14,23 @@ func datasourceAdverityDestinationType() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"api_search_term": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The search term corresponding to what you would search for in the API.",
 			},
 			"slug_search_term": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The slug of the destination type you're looking for.",
 			},
 			"destination_type_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The ID of the destination type for your instance.",
 			},
 		},
 		ReadContext: datasourceDestinationType,
+		Description: "This data source will look up the destination type ID, which is needed to create a destination of the correct type. This ID changes depending on the Adverity instance.",
 	}
 }
 

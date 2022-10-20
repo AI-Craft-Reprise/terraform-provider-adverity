@@ -12,19 +12,23 @@ func datasourceAdverityConnectionApp() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"connection_type_id": {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The connection type ID for the connection for which you're looking up the app ID.",
 			},
 			"selector": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "An optional selector for when there is the possibility of finding multiple apps. Make sure this corresponds to the name of the app in the API.",
 			},
 			"app": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The ID of the app or the connection type.",
 			},
 		},
 		ReadContext: datasourceConnectionApp,
+		Description: "An app ID lookup for connections that are authorised through an app (as opposed to with service account keys or other methods).",
 	}
 }
 

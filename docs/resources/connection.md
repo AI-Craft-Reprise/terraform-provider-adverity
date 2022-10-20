@@ -3,12 +3,12 @@
 page_title: "adverity_connection Resource - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  This resource will create a connection (a.k.a. authorization) of the given type in the given workspace.
 ---
 
 # adverity_connection (Resource)
 
-
+This resource will create a connection (a.k.a. authorization) of the given type in the given workspace.
 
 
 
@@ -17,17 +17,17 @@ description: |-
 
 ### Required
 
-- **connection_type_id** (Number)
-- **name** (String)
-- **stack** (Number)
+- **connection_type_id** (Number) The type ID of the connection.
+- **name** (String) The name of the connection.
+- **stack** (Number) The ID of the workspace to create this connection in.
 
 ### Optional
 
-- **connection_parameters** (Map of String)
+- **connection_parameters** (Map of String) A map of extra parameters needed for connection creation. For example 'app' or 'service_account_data'.
 - **id** (String) The ID of this resource.
 
 ### Read-Only
 
-- **is_authorized** (Boolean)
+- **is_authorized** (Boolean) Whether the connection has been authorised.
 
 

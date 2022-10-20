@@ -27,8 +27,9 @@ func datastream() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the datastream.",
 			},
 			"description": {
 				Type:     schema.TypeString,
@@ -41,6 +42,7 @@ func datastream() *schema.Resource {
 					}
 					return
 				},
+				Description: "The description of the datastream. Must be under 1000 characters.",
 			},
 			"retention_type": {
 				Type:     schema.TypeInt,
@@ -68,24 +70,29 @@ func datastream() *schema.Resource {
 				Description: "The amount (N) of fetches/extracts/days to retain (raw extracts are not counted). Must be an integer greater than zero.",
 			},
 			"overwrite_key_columns": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Overwrite rows according to Key defined in Schema Mapping.",
 			},
 			"overwrite_datastream": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Delete/Drop all existing rows (created by this datastream) in the destination before inserting a new import.",
 			},
 			"overwrite_filename": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Overwrite rows from same extract file.",
 			},
 			"is_insights_mediaplan": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "If true, generated extracts will be treated as Insights mediaplans.",
 			},
 			"manage_extract_names": {
-				Type:     schema.TypeBool,
-				Optional: true,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Description: "Split by selected date column and name extracts with pre-defined pattern to consolidate data.",
 			},
 			"extract_name_keys": {
 				Type:     schema.TypeString,
@@ -97,27 +104,33 @@ func datastream() *schema.Resource {
 					}
 					return
 				},
+				Description: "The name of the date column for splitting extracts.",
 			},
 			"stack": {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The ID of the workspace thsi datastream belongs to.",
 			},
 			"auth": {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The ID of the connection/authorization this datastream uses.",
 			},
 			"datatype": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Either 'Live' or 'Staging'.",
 			},
 			"enabled": {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "Whether the datastream should be enabled or not.",
 			},
 			"datastream_type_id": {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The ID of the type of datastream.",
 			},
 			"datastream_parameters": {
 				Type:     schema.TypeMap,
@@ -125,6 +138,7 @@ func datastream() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "A map of parameters that are specific for this datstream type. Values should be single values.",
 			},
 			"datastream_list": {
 				Type:     schema.TypeSet,
@@ -137,8 +151,9 @@ func datastream() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"name": {
-										Type:     schema.TypeString,
-										Optional: true,
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The key/name of the parameter.",
 									},
 									"values": {
 										Type:     schema.TypeList,
@@ -146,12 +161,14 @@ func datastream() *schema.Resource {
 										Elem: &schema.Schema{
 											Type: schema.TypeInt,
 										},
+										Description: "A list with integer values for the parameter.",
 									},
 								},
 							},
 						},
 					},
 				},
+				Description: "A map of parameters that are specific for this datstream type. Values should be lists of numbers.",
 			},
 			"datastream_string_list": {
 				Type:     schema.TypeSet,
@@ -164,8 +181,9 @@ func datastream() *schema.Resource {
 							Elem: &schema.Resource{
 								Schema: map[string]*schema.Schema{
 									"name": {
-										Type:     schema.TypeString,
-										Optional: true,
+										Type:        schema.TypeString,
+										Optional:    true,
+										Description: "The key/name of the parameter.",
 									},
 									"values": {
 										Type:     schema.TypeList,
@@ -173,12 +191,14 @@ func datastream() *schema.Resource {
 										Elem: &schema.Schema{
 											Type: schema.TypeString,
 										},
+										Description: "A list with string values for the parameter.",
 									},
 								},
 							},
 						},
 					},
 				},
+				Description: "A map of parameters that are specific for this datstream type. Values should be lists of strings.",
 			},
 			"schedules": {
 				Type:     schema.TypeList,
@@ -186,15 +206,18 @@ func datastream() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"cron_preset": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "A string indicating how often the datastream should be scheduled.",
 						},
 						"time_range_preset": {
-							Type:     schema.TypeInt,
-							Required: true,
+							Type:        schema.TypeInt,
+							Required:    true,
+							Description: "A number corresponding to the time range for which the schedule shoudl fetch data.",
 						},
 					},
 				},
+				Description: "A list of schedules for when fetches for the datastream shoudl be scheduled.",
 			},
 			"schedule_randomise_config": {
 				Type:     schema.TypeList,
@@ -224,8 +247,10 @@ func datastream() *schema.Resource {
 						},
 					},
 				},
+				Description: "A configuration to randomise the time of day for when fetches should be scheduled.",
 			},
 		},
+		Description: "This resource will create a datastream of the given type in the given workspace.",
 	}
 }
 

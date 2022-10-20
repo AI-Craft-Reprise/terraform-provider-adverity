@@ -3,12 +3,12 @@
 page_title: "adverity_workspace Data Source - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  A data source retrieving the information regarding an Adverity workspace.
 ---
 
 # adverity_workspace (Data Source)
 
-
+A data source retrieving the information regarding an Adverity workspace.
 
 
 
@@ -17,8 +17,8 @@ description: |-
 
 ### Required
 
-- **slug** (String)
-- **workspace_id** (String)
+- **slug** (String) The slug of this workspace.
+- **workspace_id** (String) The ID of this workspace.
 
 ### Optional
 
@@ -26,8 +26,8 @@ description: |-
 
 ### Read-Only
 
-- **datalake_id** (String)
-- **name** (String)
-- **parent_id** (Number)
+- **datalake_id** (String) The ID of the datalake this workspace is bound to.
+- **name** (String) The name of the workspace.
+- **parent_id** (Number) The Id of the parent workspace, if any.
 
 

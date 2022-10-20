@@ -3,12 +3,12 @@
 page_title: "adverity_destination_mapping Resource - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  This resource maps a datasytream to a destination, amking sure that the data from the datastream fetches ends up in the given destination.
 ---
 
 # adverity_destination_mapping (Resource)
 
-
+This resource maps a datasytream to a destination, amking sure that the data from the datastream fetches ends up in the given destination.
 
 
 
@@ -17,10 +17,10 @@ description: |-
 
 ### Required
 
-- **datastream_id** (Number)
-- **destination_id** (Number)
-- **destination_type** (Number)
-- **table_name** (String)
+- **datastream_id** (Number) The ID of the datastream.
+- **destination_id** (Number) The ID of the destination.
+- **destination_type** (Number) The type ID of the destination.
+- **table_name** (String) The name of the table in this destination the datstream should write to. This will create a table if none exists.
 
 ### Optional
 

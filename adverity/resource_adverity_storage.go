@@ -21,22 +21,27 @@ func storage() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the storage.",
 			},
 			"stack": {
-				Type:     schema.TypeInt,
-				Optional: true,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Description: "The workspace ID this storage should be made in.",
 			},
 			"url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The url of the externl storage location.",
 			},
 			"auth": {
-				Type:     schema.TypeInt,
-				Required: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				Description: "The ID of the connection that authorises this storage.",
 			},
 		},
+		Description: "A resource creating a storage needed for creating new workspaces.",
 	}
 }
 

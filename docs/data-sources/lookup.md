@@ -3,12 +3,12 @@
 page_title: "adverity_lookup Data Source - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  This resource will perform the lookups for certain values that are needed in datastream creation.
 ---
 
 # adverity_lookup (Data Source)
 
-
+This resource will perform the lookups for certain values that are needed in datastream creation.
 
 
 
@@ -17,29 +17,29 @@ description: |-
 
 ### Required
 
-- **expect_string** (Boolean)
-- **url** (String)
+- **expect_string** (Boolean) Whether the API will return strings or integers wehn doing a lookup.
+- **url** (String) The URL to where the lookup should be done. For example: ads_insights/adsinsightsdatastream/filter_business/
 
 ### Optional
 
-- **disable_lookup** (Boolean)
+- **disable_lookup** (Boolean) An optional parameter to disable the lookup (for example when the connection isn't authorised yet).
 - **id** (String) The ID of this resource.
-- **match_exact_term** (Boolean)
-- **parameters** (Block List) (see [below for nested schema](#nestedblock--parameters))
-- **search_terms** (List of String)
+- **match_exact_term** (Boolean) If set to true, a search term has to match their text label in Adverity exactly to be considered a match. If false, a search term also matches if it is contained in the Adverity text label.
+- **parameters** (Block List) A list of the parameters that belong to the lookup. The argument key and value should be specified. (see [below for nested schema](#nestedblock--parameters))
+- **search_terms** (List of String) A list with all the terms to be looked up.
 
 ### Read-Only
 
-- **filtered_list** (List of String)
-- **id_mappings** (List of Object) (see [below for nested schema](#nestedatt--id_mappings))
+- **filtered_list** (List of String) A list with the IDs of all matching results.
+- **id_mappings** (List of Object) A list mapping the IDs to their respective texts. (see [below for nested schema](#nestedatt--id_mappings))
 
 <a id="nestedblock--parameters"></a>
 ### Nested Schema for `parameters`
 
 Required:
 
-- **argument** (String)
-- **value** (String)
+- **argument** (String) The name of the parameter argument.
+- **value** (String) The value of the parameter argument.
 
 
 <a id="nestedatt--id_mappings"></a>
@@ -47,7 +47,7 @@ Required:
 
 Read-Only:
 
-- **id** (String)
-- **text** (String)
+- **id** (String) The ID in Adverity of the looked up term.
+- **text** (String) The text in Adverity of the looked up term.
 
 
