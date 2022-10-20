@@ -11,27 +11,33 @@ func datasourceWorkspace() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			NAME: {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The name of the workspace.",
 			},
 			DATALAKE_ID: {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The ID of the datalake this workspace is bound to.",
 			},
 			PARENT_ID: {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The Id of the parent workspace, if any.",
 			},
 			SLUG: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The slug of this workspace.",
 			},
 			WORKSPACE_ID: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The ID of this workspace.",
 			},
 		},
 		ReadContext: workspaceDataSource,
+		Description: "A data source retrieving the information regarding an Adverity workspace.",
 	}
 }
 

@@ -16,8 +16,9 @@ func datasourceAdverityLookup() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"url": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The URL to where the lookup should be done. For example: ads_insights/adsinsightsdatastream/filter_business/",
 			},
 			"parameters": {
 				Type:     schema.TypeList,
@@ -25,15 +26,18 @@ func datasourceAdverityLookup() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"argument": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The name of the parameter argument.",
 						},
 						"value": {
-							Type:     schema.TypeString,
-							Required: true,
+							Type:        schema.TypeString,
+							Required:    true,
+							Description: "The value of the parameter argument.",
 						},
 					},
 				},
+				Description: "A list of the parameters that belong to the lookup. The argument key and value should be specified.",
 			},
 			"id_mappings": {
 				Type:     schema.TypeList,
@@ -41,15 +45,18 @@ func datasourceAdverityLookup() *schema.Resource {
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"id": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The ID in Adverity of the looked up term.",
 						},
 						"text": {
-							Type:     schema.TypeString,
-							Computed: true,
+							Type:        schema.TypeString,
+							Computed:    true,
+							Description: "The text in Adverity of the looked up term.",
 						},
 					},
 				},
+				Description: "A list mapping the IDs to their respective texts.",
 			},
 			"search_terms": {
 				Type:     schema.TypeList,
@@ -57,6 +64,7 @@ func datasourceAdverityLookup() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "A list with all the terms to be looked up.",
 			},
 			"filtered_list": {
 				Type:     schema.TypeList,
@@ -64,23 +72,28 @@ func datasourceAdverityLookup() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				Description: "A list with the IDs of all matching results.",
 			},
 			"match_exact_term": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "If set to true, a search term has to match their text label in Adverity exactly to be considered a match. If false, a search term also matches if it is contained in the Adverity text label.",
 			},
 			"expect_string": {
-				Type:     schema.TypeBool,
-				Required: true,
+				Type:        schema.TypeBool,
+				Required:    true,
+				Description: "Whether the API will return strings or integers wehn doing a lookup.",
 			},
 			"disable_lookup": {
-				Type:     schema.TypeBool,
-				Optional: true,
-				Default:  false,
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "An optional parameter to disable the lookup (for example when the connection isn't authorised yet).",
 			},
 		},
 		ReadContext: dataSourceLookupRead,
+		Description: "This resource will perform the lookups for certain values that are needed in datastream creation.",
 	}
 }
 

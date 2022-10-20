@@ -23,23 +23,28 @@ func workspace() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			NAME: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the workspace.",
 			},
 			DATALAKE_ID: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The ID of the datalake/storage this workspace should use.",
 			},
 			PARENT_ID: {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Default:  1,
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Default:     1,
+				Description: "The ID of the parent workspace.",
 			},
 			SLUG: {
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "The slug of this workspace.",
 			},
 		},
+		Description: "Theis resource will create a new workspace.",
 	}
 }
 

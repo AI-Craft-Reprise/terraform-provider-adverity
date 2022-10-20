@@ -3,12 +3,12 @@
 page_title: "adverity_connection_app Data Source - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  An app ID lookup for connections that are authorised through an app (as opposed to with service account keys or other methods).
 ---
 
 # adverity_connection_app (Data Source)
 
-
+An app ID lookup for connections that are authorised through an app (as opposed to with service account keys or other methods).
 
 
 
@@ -17,15 +17,15 @@ description: |-
 
 ### Required
 
-- **connection_type_id** (Number)
+- **connection_type_id** (Number) The connection type ID for the connection for which you're looking up the app ID.
 
 ### Optional
 
 - **id** (String) The ID of this resource.
-- **selector** (String)
+- **selector** (String) An optional selector for when there is the possibility of finding multiple apps. Make sure this corresponds to the name of the app in the API.
 
 ### Read-Only
 
-- **app** (Number)
+- **app** (Number) The ID of the app or the connection type.
 
 

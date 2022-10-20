@@ -14,19 +14,23 @@ func datasourceAdverityDatastreamType() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"api_search_term": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The search term corresponding to what you would search for in the API.",
 			},
 			"slug_search_term": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The slug of the datastream type you're looking for.",
 			},
 			"datastream_type_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The ID of the datastream type for your instance.",
 			},
 		},
 		ReadContext: datasourceDatastreamType,
+		Description: "This data source will look up the datastream type ID, which is needed to create a datastream of the correct type. This ID changes depending on the Adverity instance.",
 	}
 }
 

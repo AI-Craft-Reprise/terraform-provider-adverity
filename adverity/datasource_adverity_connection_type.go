@@ -14,19 +14,23 @@ func datasourceAdverityConnectionType() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"api_search_term": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The search term corresponding to what you would search for in the API.",
 			},
 			"slug_search_term": {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The slug of the connection type you're looking for.",
 			},
 			"connection_type_id": {
-				Type:     schema.TypeInt,
-				Computed: true,
+				Type:        schema.TypeInt,
+				Computed:    true,
+				Description: "The ID of the connection type for your instance.",
 			},
 		},
 		ReadContext: datasourceConnectionType,
+		Description: "This data source will look up the connection type ID, which is needed to create a connection of the correct type. This ID changes depending on the Adverity instance.",
 	}
 }
 

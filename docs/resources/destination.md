@@ -3,12 +3,12 @@
 page_title: "adverity_destination Resource - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  This resource will create a destination. Currently only supports BigQuery destinations.
 ---
 
 # adverity_destination (Resource)
 
-
+This resource will create a destination. Currently only supports BigQuery destinations.
 
 
 
@@ -17,17 +17,23 @@ description: |-
 
 ### Required
 
-- **auth** (Number)
-- **dataset_id** (String)
-- **destination_type** (Number)
-- **name** (String)
-- **project_id** (String)
-- **schema_mapping** (Boolean)
-- **stack** (Number)
+- **auth** (Number) The ID of the connection that authorises the destination.
+- **dataset_id** (String) The ID of the BigQuery dataset.
+- **destination_type** (Number) The type ID of the destination.
+- **name** (String) The name of the destination.
+- **project_id** (String) The GCP project ID.
+- **schema_mapping** (Boolean) If set to false, schema mapping will be turned off for this destination.
+- **stack** (Number) The Id of the workspace this destination belongs to.
 
 ### Optional
 
-- **headers_formatting** (Number)
+- **headers_formatting** (Number) A number corresponding to a style of header formatting.
 - **id** (String) The ID of this resource.
 
 
+## Import
+
+Destinations can be imported using the following format:
+```shell
+terraform import adverity_destination.default {destination_type}:{destination_id}
+```

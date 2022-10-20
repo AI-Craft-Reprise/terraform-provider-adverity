@@ -3,12 +3,12 @@
 page_title: "adverity_workspace Resource - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  Theis resource will create a new workspace.
 ---
 
 # adverity_workspace (Resource)
 
-
+Theis resource will create a new workspace.
 
 
 
@@ -17,16 +17,22 @@ description: |-
 
 ### Required
 
-- **datalake_id** (String)
-- **name** (String)
+- **datalake_id** (String) The ID of the datalake/storage this workspace should use.
+- **name** (String) The name of the workspace.
 
 ### Optional
 
 - **id** (String) The ID of this resource.
-- **parent_id** (Number)
+- **parent_id** (Number) The ID of the parent workspace.
 
 ### Read-Only
 
-- **slug** (String)
+- **slug** (String) The slug of this workspace.
 
 
+## Import
+
+Workspaces can be imported using the following format:
+```shell
+terraform import adverity_workspace.default {workspace_id}
+```

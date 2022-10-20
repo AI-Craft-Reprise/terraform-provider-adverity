@@ -23,23 +23,27 @@ func destinationMapping() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			DESTINATION_TYPE: {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The type ID of the destination.",
 			},
 			DESTINATION_ID: {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The ID of the destination.",
 			},
 			DATASTREAM_ID: {
-				Type:     schema.TypeInt,
-				Required: true,
-				ForceNew: true,
+				Type:        schema.TypeInt,
+				Required:    true,
+				ForceNew:    true,
+				Description: "The ID of the datastream.",
 			},
 			TABLE_NAME: {
-				Type:     schema.TypeString,
-				Required: true,
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "The name of the table in this destination the datstream should write to. This will create a table if none exists.",
 			},
 			"datastream_enabled": {
 				Type:       schema.TypeBool,
@@ -48,6 +52,7 @@ func destinationMapping() *schema.Resource {
 				Deprecated: "With the implementation of the colummns resource, there is no longer any reason to postpone the destination mapping until the datastream is enabled. This parameter will no longer have any effect.",
 			},
 		},
+		Description: "This resource maps a datasytream to a destination, amking sure that the data from the datastream fetches ends up in the given destination.",
 	}
 }
 

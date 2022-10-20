@@ -3,12 +3,12 @@
 page_title: "adverity_datastream_type Data Source - terraform-provider-adverity"
 subcategory: ""
 description: |-
-  
+  This data source will look up the datastream type ID, which is needed to create a datastream of the correct type. This ID changes depending on the Adverity instance.
 ---
 
 # adverity_datastream_type (Data Source)
 
-
+This data source will look up the datastream type ID, which is needed to create a datastream of the correct type. This ID changes depending on the Adverity instance.
 
 
 
@@ -17,8 +17,8 @@ description: |-
 
 ### Required
 
-- **api_search_term** (String)
-- **slug_search_term** (String)
+- **api_search_term** (String) The search term corresponding to what you would search for in the API.
+- **slug_search_term** (String) The slug of the datastream type you're looking for.
 
 ### Optional
 
@@ -26,6 +26,6 @@ description: |-
 
 ### Read-Only
 
-- **datastream_type_id** (Number)
+- **datastream_type_id** (Number) The ID of the datastream type for your instance.
 
 
